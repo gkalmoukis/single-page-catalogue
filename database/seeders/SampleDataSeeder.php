@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\Item;
@@ -14,113 +13,208 @@ class SampleDataSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create sample categories
-        $appetizers = Category::create([
-            'name' => 'Appetizers',
-            'emoji' => '🥗',
+        // Δημιουργία κατηγοριών
+        $piataImeras = Category::create([
+            'name' => 'Πιάτα Ημέρας',
+            'emoji' => '🍽️',
             'sort_order' => 1,
         ]);
 
-        $mains = Category::create([
-            'name' => 'Main Courses',
-            'emoji' => '🍽️',
+        $tisOras = Category::create([
+            'name' => 'Της Ώρας',
+            'emoji' => '🔥',
             'sort_order' => 2,
         ]);
 
-        $desserts = Category::create([
-            'name' => 'Desserts',
-            'emoji' => '🍰',
+        $salates = Category::create([
+            'name' => 'Σαλάτες',
+            'emoji' => '🥗',
             'sort_order' => 3,
         ]);
 
-        $beverages = Category::create([
-            'name' => 'Beverages',
-            'emoji' => '🥤',
+        $kafes = Category::create([
+            'name' => 'Καφέδες',
+            'emoji' => '☕',
             'sort_order' => 4,
         ]);
 
-        // Create sample items for Appetizers
+        $anapsiktika = Category::create([
+            'name' => 'Αναψυκτικά',
+            'emoji' => '🥤',
+            'sort_order' => 5,
+        ]);
+
+        // Πιάτα Ημέρας
         Item::create([
-            'name' => 'Caesar Salad',
-            'price' => 12.50,
-            'description' => 'Fresh romaine lettuce, parmesan cheese, croutons, and our signature Caesar dressing',
-            'category_id' => $appetizers->id,
+            'name' => 'Μοσχαράκι Κοκκινιστό',
+            'price' => 10.50,
+            'description' => 'Μοσχαράκι μαγειρεμένο σε κόκκινη σάλτσα, σερβίρεται με ρύζι ή πατάτες',
+            'category_id' => $piataImeras->id,
             'sort_order' => 1,
         ]);
 
         Item::create([
-            'name' => 'Bruschetta Trio',
-            'price' => 9.90,
-            'description' => 'Three pieces of toasted bread topped with tomatoes, basil, and mozzarella',
-            'category_id' => $appetizers->id,
-            'sort_order' => 2,
-        ]);
-
-        // Create sample items for Main Courses
-        Item::create([
-            'name' => 'Grilled Salmon',
-            'price' => 24.90,
-            'description' => 'Fresh Atlantic salmon grilled to perfection, served with seasonal vegetables and lemon butter sauce',
-            'category_id' => $mains->id,
-            'sort_order' => 1,
-        ]);
-
-        Item::create([
-            'name' => 'Ribeye Steak',
-            'price' => 32.00,
-            'description' => 'Premium ribeye steak cooked to your preference, served with roasted potatoes and garlic butter',
-            'category_id' => $mains->id,
+            'name' => 'Κεμπάπ Γεμιστό',
+            'price' => 9.80,
+            'description' => 'Χειροποίητο κεμπάπ με γέμιση τυριού, σερβίρεται με ρύζι ή πατάτες',
+            'category_id' => $piataImeras->id,
             'sort_order' => 2,
         ]);
 
         Item::create([
-            'name' => 'Mushroom Risotto',
-            'price' => 18.50,
-            'description' => 'Creamy arborio rice with wild mushrooms, parmesan cheese, and fresh herbs',
-            'category_id' => $mains->id,
-            'sort_order' => 3,
-        ]);
-
-        // Create sample items for Desserts
-        Item::create([
-            'name' => 'Chocolate Lava Cake',
+            'name' => 'Κεφτεδάκια',
             'price' => 8.50,
-            'description' => 'Warm chocolate cake with a molten center, served with vanilla ice cream',
-            'category_id' => $desserts->id,
-            'sort_order' => 1,
-        ]);
-
-        Item::create([
-            'name' => 'Tiramisu',
-            'price' => 7.90,
-            'description' => 'Classic Italian dessert with coffee-soaked ladyfingers and mascarpone cream',
-            'category_id' => $desserts->id,
-            'sort_order' => 2,
-        ]);
-
-        // Create sample items for Beverages
-        Item::create([
-            'name' => 'House Wine (Red/White)',
-            'price' => 6.50,
-            'description' => 'Glass of our carefully selected house wine',
-            'category_id' => $beverages->id,
-            'sort_order' => 1,
-        ]);
-
-        Item::create([
-            'name' => 'Fresh Lemonade',
-            'price' => 4.50,
-            'description' => 'Freshly squeezed lemonade with mint',
-            'category_id' => $beverages->id,
-            'sort_order' => 2,
-        ]);
-
-        Item::create([
-            'name' => 'Espresso',
-            'price' => 3.20,
-            'description' => 'Premium Italian espresso',
-            'category_id' => $beverages->id,
+            'description' => 'Τραγανά κεφτεδάκια με μυρωδικά και συνοδευτικό',
+            'category_id' => $piataImeras->id,
             'sort_order' => 3,
+        ]);
+
+        Item::create([
+            'name' => 'Μακαρόνια με Κιμά',
+            'price' => 9.00,
+            'description' => 'Κλασικά μακαρόνια με σπιτικό κιμά και τριμμένο τυρί',
+            'category_id' => $piataImeras->id,
+            'sort_order' => 4,
+        ]);
+
+        // Της Ώρας
+        Item::create([
+            'name' => 'Κοτόπουλο Φιλέτο Σχάρας',
+            'price' => 9.50,
+            'description' => 'Ζουμερό φιλέτο κοτόπουλο στη σχάρα με συνοδευτικό',
+            'category_id' => $tisOras->id,
+            'sort_order' => 1,
+        ]);
+
+        Item::create([
+            'name' => 'Μπιφτέκι Μοσχαρίσιο Σχάρας',
+            'price' => 9.00,
+            'description' => 'Χειροποίητο μπιφτέκι μοσχαρίσιο στη σχάρα με πατάτες',
+            'category_id' => $tisOras->id,
+            'sort_order' => 2,
+        ]);
+
+        Item::create([
+            'name' => 'Πανσετάκια Χοιρινά',
+            'price' => 9.20,
+            'description' => 'Τραγανά πανσετάκια χοιρινά στη σχάρα',
+            'category_id' => $tisOras->id,
+            'sort_order' => 3,
+        ]);
+
+        // Σαλάτες
+        Item::create([
+            'name' => 'Χωριάτικη',
+            'price' => 6.00,
+            'description' => 'Ντομάτα, αγγούρι, φέτα, ελιά, πιπεριά και ρίγανη',
+            'category_id' => $salates->id,
+            'sort_order' => 1,
+        ]);
+
+        Item::create([
+            'name' => 'Ταμπουλέ',
+            'price' => 6.50,
+            'description' => 'Δροσιστική σαλάτα με πλιγούρι, ντομάτα, μαϊντανό και λεμόνι',
+            'category_id' => $salates->id,
+            'sort_order' => 2,
+        ]);
+
+        // Καφέδες
+        Item::create([
+            'name' => 'Freddo Espresso',
+            'price' => 2.50,
+            'description' => 'Διπλός espresso με πάγο',
+            'category_id' => $kafes->id,
+            'sort_order' => 1,
+        ]);
+
+        Item::create([
+            'name' => 'Freddo Cappuccino',
+            'price' => 2.80,
+            'description' => 'Freddo espresso με αφρόγαλα',
+            'category_id' => $kafes->id,
+            'sort_order' => 2,
+        ]);
+
+        Item::create([
+            'name' => 'Γαλλικός',
+            'price' => 2.00,
+            'description' => 'Ζεστός καφές φίλτρου',
+            'category_id' => $kafes->id,
+            'sort_order' => 3,
+        ]);
+
+        Item::create([
+            'name' => 'Φραπεδάκι',
+            'price' => 2.20,
+            'description' => 'Κλασικός ελληνικός φραπέ',
+            'category_id' => $kafes->id,
+            'sort_order' => 4,
+        ]);
+
+        Item::create([
+            'name' => 'Ελληνικός',
+            'price' => 1.80,
+            'description' => 'Δεν τον λέμε, αλλά τον φτιάχνουμε :P',
+            'category_id' => $kafes->id,
+            'sort_order' => 5,
+        ]);
+
+        // Αναψυκτικά
+        Item::create([
+            'name' => 'Coca Cola Zero',
+            'price' => 1.80,
+            'description' => '330ml κουτάκι',
+            'category_id' => $anapsiktika->id,
+            'sort_order' => 1,
+        ]);
+
+        Item::create([
+            'name' => 'Coca Cola Light',
+            'price' => 1.80,
+            'description' => '330ml κουτάκι',
+            'category_id' => $anapsiktika->id,
+            'sort_order' => 2,
+        ]);
+
+        Item::create([
+            'name' => 'Coca Cola',
+            'price' => 1.80,
+            'description' => '330ml κουτάκι',
+            'category_id' => $anapsiktika->id,
+            'sort_order' => 3,
+        ]);
+
+        Item::create([
+            'name' => 'Fanta',
+            'price' => 1.80,
+            'description' => '330ml κουτάκι',
+            'category_id' => $anapsiktika->id,
+            'sort_order' => 4,
+        ]);
+
+        Item::create([
+            'name' => 'Sprite',
+            'price' => 1.80,
+            'description' => '330ml κουτάκι',
+            'category_id' => $anapsiktika->id,
+            'sort_order' => 5,
+        ]);
+
+        Item::create([
+            'name' => 'Ανθρακούχο Νερό',
+            'price' => 1.50,
+            'description' => 'Ανθρακούχο φυσικό μεταλλικό νερό',
+            'category_id' => $anapsiktika->id,
+            'sort_order' => 6,
+        ]);
+
+        Item::create([
+            'name' => 'Νερό 1.4L',
+            'price' => 1.00,
+            'description' => 'Εμφιαλωμένο νερό 1.5 λίτρων',
+            'category_id' => $anapsiktika->id,
+            'sort_order' => 7,
         ]);
     }
 }
