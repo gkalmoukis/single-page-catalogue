@@ -65,6 +65,15 @@
             font-weight: 500;
         }
 
+        .category-description {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            color: #666;
+            font-style: italic;
+            border-left: 4px solid #f5576c;
+            margin: 0;
+        }
+
         .items {
             padding: 30px;
         }
@@ -194,6 +203,9 @@
                                 {{ $category->emoji }}
                             @endif
                             {{ $category->name }}
+                        </div>
+                        <div class="category-description">
+                            {{ $category->description }}
                         </div>
                         
                         @if($category->items->count() > 0)
