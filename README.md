@@ -133,8 +133,8 @@ chmod -R 755 bootstrap/cache
 Update your `.env` file on the server:
 
 ```env
-APP_NAME="Restaurant Management"
-APP_ENV=production
+APP_NAME="OTI THELEIS"
+APP_ENV=local
 APP_DEBUG=false
 APP_URL=https://your-domain.com
 
