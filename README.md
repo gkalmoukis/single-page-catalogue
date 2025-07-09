@@ -1,61 +1,272 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# signle-page-catalogue
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel application with Filament admin panel for managing restaurant operations including categories and items.
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2 or higher
+- Composer
+- Node.js & NPM
+- SQLite (default) or MySQL/PostgreSQL
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Local Installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Clone the Repository
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2. Install Dependencies
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+# Install PHP dependencies
+composer install
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Install Node.js dependencies
+npm install
+```
 
-## Laravel Sponsors
+### 3. Environment Setup
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+# Copy environment file
+cp .env.example .env
 
-### Premium Partners
+# Generate application key
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 4. Database Setup
 
-## Contributing
+```bash
+# Create SQLite database file (if using SQLite)
+touch database/database.sqlite
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Run migrations
+php artisan migrate
 
-## Code of Conduct
+# Seed the database with sample data
+php artisan db:seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5. Build Assets
 
-## Security Vulnerabilities
+```bash
+# For development
+npm run dev
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# For production
+npm run build
+```
 
-## License
+### 6. Start Development Server
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+# Option 1: Use Laravel's built-in server
+php artisan serve
+
+# Option 2: Use the dev command (runs server, queue, logs, and vite)
+composer run dev
+```
+
+### 7. Access the Application
+
+- **Frontend**: http://localhost:8000
+- **Admin Panel**: http://localhost:8000/admin
+- **Admin Credentials**: 
+  - Email: admin@restaurant.com
+  - Password: password
+
+## Laravel Forge Installation
+
+### 1. Server Requirements
+
+Ensure your Forge server meets the requirements:
+- PHP 8.2+
+- Composer
+- Node.js & NPM
+
+### 2. Site Setup
+
+1. Create a new site in Laravel Forge
+2. Set the web directory to `/public`
+3. Enable "Wildcard Sub-Domains" if needed
+
+### 3. Repository Deployment
+
+1. Connect your Git repository to the site
+2. Set up auto-deployment if desired
+3. Configure the deployment script:
+
+```bash
+cd /home/forge/your-site-name
+git pull origin main
+composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+npm ci
+npm run build
+
+# Copy environment file if not exists
+if [ ! -f .env ]; then
+    cp .env.example .env
+fi
+
+# Generate key if needed
+if ! grep -q "APP_KEY=base64:" .env; then
+    php artisan key:generate --force
+fi
+
+# Database setup
+php artisan migrate --force
+php artisan db:seed --force
+
+# Cache optimization
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan queue:restart
+
+# Set permissions
+chmod -R 755 storage
+chmod -R 755 bootstrap/cache
+```
+
+### 4. Environment Configuration
+
+Update your `.env` file on the server:
+
+```env
+APP_NAME="Restaurant Management"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+# Database (if using MySQL)
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# Or keep SQLite for simplicity
+DB_CONNECTION=sqlite
+DB_DATABASE=/home/forge/your-site-name/database/database.sqlite
+
+# Mail configuration
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-email
+MAIL_PASSWORD=your-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@your-domain.com
+```
+
+### 5. SSL Certificate
+
+Enable SSL certificate through Laravel Forge for your domain.
+
+### 6. Queue Workers (Optional)
+
+If using queues, set up a daemon in Forge:
+- Command: `php artisan queue:work --sleep=3 --tries=3`
+- Directory: `/home/forge/your-site-name`
+
+## Usage
+
+### Admin Panel Features
+
+- **Dashboard**: Overview of system statistics
+- **Categories**: Manage item categories
+- **Items**: Manage restaurant items
+- **Users**: User management
+
+### Default Admin Account
+
+After seeding, you can log in with:
+- Email: `admin@restaurant.com`
+- Password: `password`
+
+**Important**: Change the default password immediately in production!
+
+## Development Commands
+
+```bash
+# Run tests
+composer test
+# or
+php artisan test
+
+# Code formatting
+./vendor/bin/pint
+
+# Clear caches
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+# Run queue worker
+php artisan queue:work
+
+# Monitor logs
+php artisan pail
+```
+
+## File Structure
+
+```
+app/
+├── Filament/          # Filament admin resources
+├── Http/Controllers/  # Web controllers
+├── Models/           # Eloquent models
+│   ├── Category.php
+│   ├── Item.php
+│   └── User.php
+└── Providers/        # Service providers
+
+database/
+├── migrations/       # Database migrations
+├── seeders/         # Database seeders
+└── database.sqlite  # SQLite database file
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Permission Errors**
+   ```bash
+   sudo chown -R www-data:www-data storage bootstrap/cache
+   sudo chmod -R 775 storage bootstrap/cache
+   ```
+
+2. **Database Connection Issues**
+   - Verify database credentials in `.env`
+   - Ensure database file exists (for SQLite)
+   - Check database server is running (for MySQL/PostgreSQL)
+
+3. **Asset Issues**
+   ```bash
+   npm run build
+   php artisan cache:clear
+   ```
+
+4. **Filament Issues**
+   ```bash
+   php artisan filament:upgrade
+   php artisan view:clear
+   ```
+
+## Security
+
+- Change default admin password
+- Update `APP_KEY` in production
+- Set `APP_DEBUG=false` in production
+- Configure proper file permissions
+- Enable SSL certificates
+- Regular security updates
+
+## Support
+
+For issues and questions, please check the Laravel and Filament documentation:
+- [Laravel Documentation](https://laravel.com/docs)
+- [Filament Documentation](https://filamentphp.com/docs)
