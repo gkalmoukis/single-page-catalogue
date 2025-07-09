@@ -10,6 +10,7 @@ The following configuration variables can be set in your `.env` file:
 |----------|-------------|---------------|----------|
 | `DEFAULT_ADMIN_PASSWORD` | Default password for the admin user when seeding the database | `password` | No |
 | `CATALOGUE_CACHE_KEY` | Cache key for storing restaurant catalogue data (categories and items) | `catalogue` | No |
+| `CATALOGUE_CACHE_TTL` | Cache time-to-live in seconds for restaurant catalogue data | `3600` (1 hour) | No |
 
 **Security Note**: Always change the default admin password in production environments by setting `DEFAULT_ADMIN_PASSWORD` in your `.env` file or updating the password through the admin panel.
 

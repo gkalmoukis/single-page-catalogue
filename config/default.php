@@ -23,4 +23,16 @@ return [
     |
     */
     'catalogue_cache_key' => env('CATALOGUE_CACHE_KEY', 'catalogue'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Catalogue Cache TTL
+    |--------------------------------------------------------------------------
+    |
+    | This value defines the time-to-live (TTL) in seconds for the restaurant
+    | catalogue cache. This determines how long the cached categories and items
+    | data will be stored before being refreshed.
+    |
+    */
+    'catalogue_cache_ttl' => env('CATALOGUE_CACHE_TTL', 3600),
 ];

@@ -11,12 +11,16 @@ class RestaurantController extends Controller
     public function index()
     {
         return view('restaurant.index', [
-            'categories' => Cache::remember(config('default.catalogue_cache_key'), 3600, function () {
-                return Category::with([
-                    'items' => fn ($query) => $query->orderBy('sort_order')])
-                        ->orderBy('sort_order')
-                        ->get();
-            })
+            'categories' => Cache::remember(
+                config('default.catalogue_cache_key'), 
+                config('default.catalogue_cache_ttl'), 
+                function () {
+                    return Category::with([
+                        'items' => fn ($query) => $query->orderBy('sort_order')])
+                            ->orderBy('sort_order')
+                            ->get();
+                }
+            )
         ]);
     }
 }
