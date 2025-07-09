@@ -9,6 +9,7 @@ The following configuration variables can be set in your `.env` file:
 | Variable | Description | Default Value | Required |
 |----------|-------------|---------------|----------|
 | `DEFAULT_ADMIN_PASSWORD` | Default password for the admin user when seeding the database | `password` | No |
+| `CATALOGUE_CACHE_KEY` | Cache key for storing restaurant catalogue data (categories and items) | `catalogue` | No |
 
 **Security Note**: Always change the default admin password in production environments by setting `DEFAULT_ADMIN_PASSWORD` in your `.env` file or updating the password through the admin panel.
 
