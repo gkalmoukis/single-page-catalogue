@@ -12,78 +12,76 @@
         }
 
         body {
-            font-family: 'Georgia', serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #f8f9fa;
+            background-color: #f5f5f5;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 50px;
-            padding: 40px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header h1 {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            font-weight: 300;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #333;
         }
 
         .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            font-size: 1rem;
+            color: #666;
         }
 
         .catalogue {
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
         .category {
             background: white;
-            margin-bottom: 40px;
-            border-radius: 15px;
+            margin-bottom: 30px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .category-header {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 20px 30px;
-            font-size: 1.8rem;
-            font-weight: 500;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
         }
 
         .category-description {
             background: #f8f9fa;
-            padding: 15px 30px;
+            padding: 0 20px 20px;
             color: #666;
-            font-style: italic;
-            border-left: 4px solid #f5576c;
-            margin: 0;
+            font-size: 0.9rem;
         }
 
         .items {
-            padding: 30px;
+            padding: 20px;
         }
 
         .item {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding: 20px 0;
-            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .item:last-child {
@@ -95,72 +93,68 @@
         }
 
         .item-name {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
         }
 
         .item-description {
             color: #666;
-            font-size: 1rem;
-            line-height: 1.5;
+            font-size: 0.9rem;
         }
 
         .item-price {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #e74c3c;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
             margin-left: 20px;
         }
 
         .cta-section {
             text-align: center;
-            padding: 50px 0;
+            padding: 30px 20px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .cta-buttons {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .cta-button {
             display: inline-block;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 20px;
+            background: #007bff;
             color: white;
             text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease;
         }
 
         .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: #0056b3;
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             color: #666;
         }
 
         .empty-state h3 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin-bottom: 10px;
         }
 
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
 
             .item {
@@ -170,7 +164,7 @@
 
             .item-price {
                 margin-left: 0;
-                margin-top: 10px;
+                margin-top: 8px;
                 text-align: right;
             }
 
@@ -180,7 +174,7 @@
             }
 
             .cta-button {
-                width: 250px;
+                width: 200px;
             }
         }
     </style>
@@ -204,9 +198,11 @@
                             @endif
                             {{ $category->name }}
                         </div>
-                        <div class="category-description">
-                            {{ $category->description }}
-                        </div>
+                        @if($category->description)
+                            <div class="category-description">
+                                {{ $category->description }}
+                            </div>
+                        @endif
                         
                         @if($category->items->count() > 0)
                             <div class="items">
@@ -218,7 +214,7 @@
                                                 <div class="item-description">{{ $item->description }}</div>
                                             @endif
                                         </div>
-                                        <div class="item-price">€{{ number_format($item->price, 2) }}</div>
+                                        <div class="item-price">{{ number_format($item->price, 2, ',', '.') }} €</div>
                                     </div>
                                 @endforeach
                             </div>
@@ -242,9 +238,9 @@
         <!-- Call-to-Actions Section -->
         <div class="cta-section">
             <div class="cta-buttons">
-                <a href="tel:+1234567890" class="cta-button">📞 Call Us</a>
-                <a href="#" class="cta-button">📍 Find Us</a>
-                <a href="https://maps.google.com/maps?q=restaurant+near+me" target="_blank" class="cta-button">🗺 Get Directions</a>
+                <a href="tel:+1234567890" class="cta-button">Call Us</a>
+                <a href="#" class="cta-button">Find Us</a>
+                <a href="https://maps.google.com/maps?q=restaurant+near+me" target="_blank" class="cta-button">Get Directions</a>
             </div>
         </div>
     </div>
