@@ -2,6 +2,8 @@
 
 A Laravel application with Filament admin panel for managing restaurant operations including categories and items.
 
+[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2F240a3d35-6015-44bd-92e1-bf652345a42f%3Fdate%3D1%26commit%3D1&style=flat)](https://forge.laravel.com/servers/779123/sites/2777838)
+
 ## Configuration Variables
 
 The following configuration variables can be set in your `.env` file:
