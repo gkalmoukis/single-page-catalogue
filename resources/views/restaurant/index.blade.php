@@ -58,7 +58,6 @@
 
         .category-header {
             background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
             padding: 20px;
             font-size: 1.5rem;
             font-weight: 600;
@@ -70,6 +69,7 @@
             padding: 0 20px 20px;
             color: #666;
             font-size: 0.9rem;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .items {
