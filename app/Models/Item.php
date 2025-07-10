@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 
 class Item extends Model
 {
@@ -16,6 +17,7 @@ class Item extends Model
         'sort_order',
         'category_id',
         'is_active',
+        'tenant_id',
     ];
 
     protected $casts = [
@@ -26,6 +28,11 @@ class Item extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     public function tags(): BelongsToMany
@@ -46,6 +53,11 @@ class Item extends Model
         return $query->where('is_active', true);
     }
 
+    public function scopeForTenant($query, $tenantId)
+    {
+        return $query->where('tenant_id', $tenantId);
+    }
+
     protected static function booted()
     {
         static::saved(function () {
@@ -54,6 +66,13 @@ class Item extends Model
 
         static::deleted(function () {
             Cache::forget(config('default.catalogue_cache_key'));
+        });
+
+        // Auto-assign tenant_id when creating
+        static::creating(function ($model) {
+            if (!$model->tenant_id && Auth::check() && Auth::user()->current_tenant_id) {
+                $model->tenant_id = Auth::user()->current_tenant_id;
+            }
         });
     }
 }

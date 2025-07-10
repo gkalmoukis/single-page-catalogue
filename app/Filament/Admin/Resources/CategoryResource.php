@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\CategoryResource\Pages;
 use App\Filament\Admin\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
+use App\Services\TenantService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -27,6 +28,14 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('tenant_id')
+                    ->label('Restaurant')
+                    ->relationship('tenant', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload()
+                    ->disabled(fn() => !auth()->user()->is_admin)
+                    ->default(fn() => auth()->user()->is_admin ? null : auth()->user()->tenants->first()?->id),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -48,6 +57,10 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('tenant.name')
+                    ->label('Restaurant')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('emoji')
                     ->searchable()
                     ->sortable(),
@@ -76,13 +89,17 @@ class CategoryResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('sort_order')
-            ->reorderable('sort_order')
+            ->defaultSort('tenant.name')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('tenant_id')
+                    ->label('Restaurant')
+                    ->relationship('tenant', 'name')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -105,5 +122,20 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
+    }
+
+    // Admin access to all tenant data
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->with('tenant');
+        
+        // Admin users can see all data
+        if (auth()->user()->is_admin) {
+            return $query;
+        }
+        
+        // Regular users can only see data from their associated tenants
+        $userTenantIds = auth()->user()->tenants->pluck('id');
+        return $query->whereIn('tenant_id', $userTenantIds);
     }
 }

@@ -1,286 +1,278 @@
-# signle-page-catalogue
+# Multi-Tenant Restaurant Catalog SaaS
 
-A Laravel application with Filament admin panel for managing restaurant operations including categories and items.
+A Laravel application with Filament admin panel transformed into a multi-tenant SaaS for managing restaurant operations. Each tenant gets their own subdomain and isolated admin panel.
 
 [![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2F240a3d35-6015-44bd-92e1-bf652345a42f%3Fdate%3D1%26commit%3D1&style=flat)](https://forge.laravel.com/servers/779123/sites/2777838)
 
-## Configuration Variables
+## 🚀 Multi-Tenancy Features
 
-The following configuration variables can be set in your `.env` file:
+- **Subdomain-based Tenancy**: Each restaurant gets `restaurant-name.single-page-catalogue.theloom.gr`
+- **Custom Domain Support**: Restaurants can use their own domains
+- **Isolated Data**: Complete data separation between tenants
+- **Tenant-specific Admin Panels**: Each tenant has their own Filament admin interface
+- **SaaS Landing Page**: Main site showcases available restaurants and allows new registrations
+- **User Management**: Users can be associated with multiple tenants with different roles
 
-| Variable | Description | Default Value | Required |
-|----------|-------------|---------------|----------|
-| `DEFAULT_ADMIN_PASSWORD` | Default password for the admin user when seeding the database | `password` | No |
-| `CATALOGUE_CACHE_KEY` | Cache key for storing restaurant catalogue data (categories and items) | `catalogue` | No |
-| `CATALOGUE_CACHE_TTL` | Cache time-to-live in seconds for restaurant catalogue data | `3600` (1 hour) | No |
+## 🏗️ Architecture
 
-**Security Note**: Always change the default admin password in production environments by setting `DEFAULT_ADMIN_PASSWORD` in your `.env` file or updating the password through the admin panel.
+### Database Schema
+- **Tenants Table**: Stores tenant information (name, slug, domain, settings)
+- **Tenant-User Pivot**: Many-to-many relationship with roles
+- **Scoped Models**: All restaurant data (categories, items, tags) are scoped to tenants
 
-## Requirements
+### URL Structure
+- **Main Site**: `https://single-page-catalogue.theloom.gr` - SaaS landing page
+- **Tenant Sites**: `https://pizza-palace.single-page-catalogue.theloom.gr` - Restaurant catalog
+- **Tenant Admin**: `https://pizza-palace.single-page-catalogue.theloom.gr/admin` - Admin panel
+- **Custom Domains**: `https://restaurant.com` - Custom domain support
 
-- PHP 8.2 or higher
+## 📋 Requirements
+
+- PHP 8.2+
 - Composer
-- Node.js & NPM
-- SQLite (default) or MySQL/PostgreSQL
+- Laravel 11
+- SQLite/MySQL/PostgreSQL
+- Node.js & npm
 
-## Local Installation
+## 🔧 Installation
 
-### 1. Clone the Repository
-
-
-### 2. Install Dependencies
-
+### 1. Clone and Setup
 ```bash
-# Install PHP dependencies
+git clone <repository-url>
+cd otitheleis
 composer install
-
-# Install Node.js dependencies
-npm install
+npm install && npm run build
 ```
 
-### 3. Environment Setup
-
+### 2. Environment Configuration
 ```bash
-# Copy environment file
 cp .env.example .env
-
-# Generate application key
 php artisan key:generate
 ```
 
-### 4. Database Setup
-
+### 3. Database Setup
 ```bash
-# Create SQLite database file (if using SQLite)
+# For SQLite (default)
 touch database/database.sqlite
 
-# Run migrations
-php artisan migrate
-
-# Seed the database with sample data
-php artisan db:seed
+# Run migrations and seeders
+php artisan migrate:fresh --seed
 ```
 
-### 5. Build Assets
+### 4. Configuration Variables
 
-```bash
-# For development
-npm run dev
-
-# For production
-npm run build
-```
-
-### 6. Start Development Server
-
-```bash
-# Option 1: Use Laravel's built-in server
-php artisan serve
-
-# Option 2: Use the dev command (runs server, queue, logs, and vite)
-composer run dev
-```
-
-### 7. Access the Application
-
-- **Frontend**: http://localhost:8000
-- **Admin Panel**: http://localhost:8000/admin
-- **Admin Credentials**: 
-  - Email: admin@restaurant.com
-  - Password: password
-
-## Laravel Forge Installation
-
-### 1. Server Requirements
-
-Ensure your Forge server meets the requirements:
-- PHP 8.2+
-- Composer
-- Node.js & NPM
-
-### 2. Site Setup
-
-1. Create a new site in Laravel Forge
-2. Set the web directory to `/public`
-3. Enable "Wildcard Sub-Domains" if needed
-
-### 3. Repository Deployment
-
-1. Connect your Git repository to the site
-2. Set up auto-deployment if desired
-3. Configure the deployment script:
-
-```bash
-cd /home/forge/your-site-name
-git pull origin main
-composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-npm ci
-npm run build
-
-# Copy environment file if not exists
-if [ ! -f .env ]; then
-    cp .env.example .env
-fi
-
-# Generate key if needed
-if ! grep -q "APP_KEY=base64:" .env; then
-    php artisan key:generate --force
-fi
-
-# Database setup
-php artisan migrate --force
-php artisan db:seed --force
-
-# Cache optimization
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan queue:restart
-
-# Set permissions
-chmod -R 755 storage
-chmod -R 755 bootstrap/cache
-```
-
-### 4. Environment Configuration
-
-Update your `.env` file on the server:
+Update your `.env` file:
 
 ```env
-APP_NAME="OTI THELEIS"
-APP_ENV=local
-APP_DEBUG=false
-APP_URL=https://your-domain.com
+APP_NAME="Restaurant Catalog SaaS"
+APP_URL=https://single-page-catalogue.theloom.gr
 
-# Database (if using MySQL)
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=your_database
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-
-# Or keep SQLite for simplicity
+# Database
 DB_CONNECTION=sqlite
-DB_DATABASE=/home/forge/your-site-name/database/database.sqlite
+DB_DATABASE=/absolute/path/to/database/database.sqlite
 
-# Mail configuration
-MAIL_MAILER=smtp
-MAIL_HOST=your-smtp-host
-MAIL_PORT=587
-MAIL_USERNAME=your-email
-MAIL_PASSWORD=your-password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@your-domain.com
+# Admin Configuration
+ADMIN_PASSWORD=your-secure-password
+
+# Cache Configuration
+CATALOGUE_CACHE_KEY=restaurant_catalogue
+CATALOGUE_CACHE_TTL=3600
 ```
 
-### 5. SSL Certificate
+## 🎯 Demo Data
 
-Enable SSL certificate through Laravel Forge for your domain.
+The application comes with pre-seeded demo tenants:
 
-### 6. Queue Workers (Optional)
+1. **Pizza Palace** (`pizza-palace.single-page-catalogue.theloom.gr`)
+   - Login: `pizza@restaurant.com` / `password`
+   - Italian restaurant with pizzas and beverages
 
-If using queues, set up a daemon in Forge:
-- Command: `php artisan queue:work --sleep=3 --tries=3`
-- Directory: `/home/forge/your-site-name`
+2. **Burger Barn** (`burger-barn.single-page-catalogue.theloom.gr`)
+   - Login: `burger@restaurant.com` / `password`
+   - American restaurant with burgers and sides
 
-## Usage
+3. **Greek Taverna** (`greek-taverna.single-page-catalogue.theloom.gr`)
+   - Login: `greek@restaurant.com` / `password`
+   - Greek restaurant with traditional dishes
 
-### Admin Panel Features
+4. **System Admin** (Main site admin only)
+   - Login: `giorgoskalmoukis@theloom.gr` / `your-admin-password`
 
-- **Dashboard**: Overview of system statistics
-- **Categories**: Manage item categories
-- **Items**: Manage restaurant items
-- **Users**: User management
+## 🚀 Usage
 
-### Default Admin Account
+### For Restaurant Owners
 
-After seeding, you can log in with:
-- Email: `admin@restaurant.com`
-- Password: `password`
+1. **Create Restaurant**: Visit main site and click "Create Your Restaurant Catalog"
+2. **Setup Menu**: Log into your admin panel and add categories, items, and tags
+3. **Share URL**: Share your unique subdomain with customers
+4. **Custom Domain**: Configure custom domain in tenant settings (optional)
 
-**Important**: Change the default password immediately in production!
+### For Customers
 
-## Development Commands
+1. **Browse Restaurants**: Visit main site to see all available restaurants
+2. **View Menu**: Click on any restaurant to view their catalog
+3. **Mobile Friendly**: All catalogs are responsive and mobile-optimized
 
-```bash
-# Run tests
-composer test
-# or
-php artisan test
+### For System Administrators
 
-# Code formatting
-./vendor/bin/pint
+1. **Tenant Management**: Access admin panel to manage all tenants
+2. **User Management**: Add/remove users from tenants with different roles
+3. **System Monitoring**: Monitor tenant activity and resource usage
 
-# Clear caches
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+## 🔒 Multi-Tenancy Implementation
 
-# Run queue worker
-php artisan queue:work
+### Tenant Resolution
+The `ResolveTenant` middleware automatically detects the current tenant based on:
+- Subdomain pattern: `{slug}.single-page-catalogue.theloom.gr`
+- Custom domains stored in tenant settings
 
-# Monitor logs
-php artisan pail
+### Data Scoping
+All Eloquent models automatically scope data to the current tenant:
+```php
+// Automatically scoped to current tenant
+$categories = Category::all();
+$items = Item::where('is_active', true)->get();
 ```
 
-## File Structure
-
-```
-app/
-├── Filament/          # Filament admin resources
-├── Http/Controllers/  # Web controllers
-├── Models/           # Eloquent models
-│   ├── Category.php
-│   ├── Item.php
-│   └── User.php
-└── Providers/        # Service providers
-
-database/
-├── migrations/       # Database migrations
-├── seeders/         # Database seeders
-└── database.sqlite  # SQLite database file
+### Filament Resources
+All Filament resources are automatically scoped using the `getEloquentQuery()` method:
+```php
+public static function getEloquentQuery(): Builder
+{
+    $query = parent::getEloquentQuery();
+    $tenantService = app(TenantService::class);
+    return $tenantService->scopeToCurrentTenant($query);
+}
 ```
 
-## Troubleshooting
+## 🎨 Customization
+
+### Adding New Tenant Features
+1. Add fields to tenant migration
+2. Update Tenant model fillable array
+3. Add form fields to TenantResource
+4. Update tenant seeder if needed
+
+### Custom Domains
+To add custom domain support:
+1. Update DNS settings to point to your server
+2. Configure web server (Nginx/Apache) with wildcard SSL
+3. Set domain in tenant settings through admin panel
+
+### Styling
+Each tenant can have custom styling by:
+1. Adding custom CSS fields to tenant data
+2. Modifying restaurant view template
+3. Implementing theme selection in admin panel
+
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Permission Errors**
+1. **Tenant Not Found**
    ```bash
-   sudo chown -R www-data:www-data storage bootstrap/cache
-   sudo chmod -R 775 storage bootstrap/cache
+   # Check tenant exists and is active
+   php artisan tinker
+   >>> App\Models\Tenant::where('slug', 'your-slug')->first()
    ```
 
-2. **Database Connection Issues**
-   - Verify database credentials in `.env`
-   - Ensure database file exists (for SQLite)
-   - Check database server is running (for MySQL/PostgreSQL)
-
-3. **Asset Issues**
+2. **Data Not Scoped**
    ```bash
-   npm run build
+   # Clear cache and check middleware
    php artisan cache:clear
+   php artisan config:clear
    ```
 
-4. **Filament Issues**
+3. **Admin Panel Access**
    ```bash
-   php artisan filament:upgrade
-   php artisan view:clear
+   # Ensure user is attached to tenant
+   php artisan tinker
+   >>> $tenant = App\Models\Tenant::find(1)
+   >>> $user = App\Models\User::find(1)
+   >>> $tenant->users()->attach($user->id, ['role' => 'admin'])
    ```
 
-## Security
+## 🚀 Deployment
 
-- Change default admin password
-- Update `APP_KEY` in production
-- Set `APP_DEBUG=false` in production
-- Configure proper file permissions
-- Enable SSL certificates
-- Regular security updates
+### Laravel Forge
+1. Create server and site for main domain
+2. Configure wildcard SSL certificate
+3. Set up environment variables
+4. Deploy with automatic deployment script
 
-## Support
+### Manual Deployment
+1. Configure web server with wildcard domain support
+2. Set up SSL certificates (Let's Encrypt wildcard)
+3. Configure environment for production
+4. Run deployment commands:
+   ```bash
+   composer install --optimize-autoloader --no-dev
+   php artisan migrate --force
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
 
-For issues and questions, please check the Laravel and Filament documentation:
-- [Laravel Documentation](https://laravel.com/docs)
-- [Filament Documentation](https://filamentphp.com/docs)
+## 📈 Scaling
+
+### Database Scaling
+- Consider separate databases per tenant for larger deployments
+- Implement database connection switching in TenantService
+- Use read replicas for better performance
+
+### Caching
+- Tenant-specific cache keys implemented
+- Redis recommended for production
+- Consider cache tags for better invalidation
+
+### CDN Integration
+- Static assets can be served via CDN
+- Tenant-specific asset versioning
+- Image optimization for menu photos
+
+## 🔐 Security
+
+- Tenant data isolation enforced at application level
+- User permissions managed through tenant-user relationships
+- SQL injection protection through Eloquent ORM
+- CSRF protection enabled
+- XSS protection through Blade templating
+
+## 📚 File Structure
+
+```
+app/
+├── Filament/Admin/Resources/    # Filament resources with tenant scoping
+├── Http/Controllers/            # Web controllers including TenantController
+├── Http/Middleware/            # ResolveTenant middleware
+├── Models/                     # Eloquent models with tenant relationships
+├── Services/                   # TenantService for tenant operations
+└── Providers/                  # Service providers
+
+database/
+├── migrations/                 # Multi-tenancy migrations
+└── seeders/                   # Demo tenant and data seeders
+
+resources/views/
+├── tenants/                   # Tenant management views
+└── restaurant/                # Restaurant catalog views
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch
+3. Add tests for new functionality
+4. Ensure tenant isolation is maintained
+5. Submit pull request
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+## 🆘 Support
+
+For issues and questions:
+- Check the troubleshooting section
+- Review Laravel and Filament documentation
+- Contact: [theloom.gr](https://theloom.gr)

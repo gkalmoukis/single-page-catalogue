@@ -158,7 +158,7 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <h1>{{ config('app.name') }}</h1>
+            <h1>{{ $tenant ? $tenant->name : config('app.name') }}</h1>
             <p>{{ __('Φάτε μπρόκολα.') }}</p>
         </div>
 

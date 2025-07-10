@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\ItemResource\Pages;
 use App\Filament\Admin\Resources\ItemResource\RelationManagers;
 use App\Models\Item;
+use App\Services\TenantService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -24,13 +25,41 @@ class ItemResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->with(['tenant', 'category']);
+        
+        // Admin users can see all data
+        if (auth()->user()->is_admin) {
+            return $query;
+        }
+        
+        // Regular users can only see data from their associated tenants
+        $userTenantIds = auth()->user()->tenants->pluck('id');
+        return $query->whereIn('tenant_id', $userTenantIds);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
+                Forms\Components\Select::make('tenant_id')
+                    ->label('Restaurant')
+                    ->relationship('tenant', 'name')
                     ->required()
+                    ->searchable()
+                    ->preload()
+                    ->disabled(fn() => !auth()->user()->is_admin)
+                    ->default(fn() => auth()->user()->is_admin ? null : auth()->user()->tenants->first()?->id),
+                Forms\Components\Select::make('category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name', fn(Builder $query) => 
+                        auth()->user()->is_admin 
+                            ? $query 
+                            : $query->whereIn('tenant_id', auth()->user()->tenants->pluck('id'))
+                    )
+                    ->required()
+                    ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -58,6 +87,10 @@ class ItemResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('tenant.name')
+                    ->label('Restaurant')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Category')
                     ->searchable()
@@ -83,8 +116,13 @@ class ItemResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('sort_order')
+            ->defaultSort('tenant.name')
             ->filters([
+                Tables\Filters\SelectFilter::make('tenant_id')
+                    ->label('Restaurant')
+                    ->relationship('tenant', 'name')
+                    ->searchable()
+                    ->preload(),
                 Tables\Filters\SelectFilter::make('category')
                     ->relationship('category', 'name'),
                 Tables\Filters\TernaryFilter::make('is_active')
@@ -96,6 +134,7 @@ class ItemResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
