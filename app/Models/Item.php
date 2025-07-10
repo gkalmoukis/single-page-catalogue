@@ -14,10 +14,12 @@ class Item extends Model
         'description',
         'sort_order',
         'category_id',
+        'is_active',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     protected static function booted()
@@ -34,5 +36,10 @@ class Item extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

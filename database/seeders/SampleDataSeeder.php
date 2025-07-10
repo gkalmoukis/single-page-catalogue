@@ -56,6 +56,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Μοσχαράκι μαγειρεμένο σε κόκκινη σάλτσα, σερβίρεται με ρύζι ή πατάτες',
             'category_id' => $piataImeras->id,
             'sort_order' => 1,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -64,6 +65,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Χειροποίητο κεμπάπ με γέμιση τυριού, σερβίρεται με ρύζι ή πατάτες',
             'category_id' => $piataImeras->id,
             'sort_order' => 2,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -72,6 +74,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Τραγανά κεφτεδάκια με μυρωδικά και συνοδευτικό',
             'category_id' => $piataImeras->id,
             'sort_order' => 3,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -80,6 +83,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Κλασικά μακαρόνια με σπιτικό κιμά και τριμμένο τυρί',
             'category_id' => $piataImeras->id,
             'sort_order' => 4,
+            'is_active' => true,
         ]);
 
         // Της Ώρας
@@ -89,6 +93,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Ζουμερό φιλέτο κοτόπουλο στη σχάρα με συνοδευτικό',
             'category_id' => $tisOras->id,
             'sort_order' => 1,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -97,6 +102,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Χειροποίητο μπιφτέκι μοσχαρίσιο στη σχάρα με πατάτες',
             'category_id' => $tisOras->id,
             'sort_order' => 2,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -105,6 +111,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Τραγανά πανσετάκια χοιρινά στη σχάρα',
             'category_id' => $tisOras->id,
             'sort_order' => 3,
+            'is_active' => true,
         ]);
 
         // Σαλάτες
@@ -114,6 +121,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Ντομάτα, αγγούρι, φέτα, ελιά, πιπεριά και ρίγανη',
             'category_id' => $salates->id,
             'sort_order' => 1,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -122,6 +130,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Δροσιστική σαλάτα με πλιγούρι, ντομάτα, μαϊντανό και λεμόνι',
             'category_id' => $salates->id,
             'sort_order' => 2,
+            'is_active' => true,
         ]);
 
         // Καφέδες
@@ -131,6 +140,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Διπλός espresso με πάγο',
             'category_id' => $kafes->id,
             'sort_order' => 1,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -139,6 +149,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Freddo espresso με αφρόγαλα',
             'category_id' => $kafes->id,
             'sort_order' => 2,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -147,6 +158,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Ζεστός καφές φίλτρου',
             'category_id' => $kafes->id,
             'sort_order' => 3,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -155,6 +167,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Κλασικός ελληνικός φραπέ',
             'category_id' => $kafes->id,
             'sort_order' => 4,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -163,6 +176,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Δεν τον λέμε, αλλά τον φτιάχνουμε :P',
             'category_id' => $kafes->id,
             'sort_order' => 5,
+            'is_active' => true,
         ]);
 
         // Αναψυκτικά
@@ -172,6 +186,7 @@ class SampleDataSeeder extends Seeder
             'description' => '330ml κουτάκι',
             'category_id' => $anapsiktika->id,
             'sort_order' => 1,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -180,6 +195,7 @@ class SampleDataSeeder extends Seeder
             'description' => '330ml κουτάκι',
             'category_id' => $anapsiktika->id,
             'sort_order' => 2,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -188,6 +204,7 @@ class SampleDataSeeder extends Seeder
             'description' => '330ml κουτάκι',
             'category_id' => $anapsiktika->id,
             'sort_order' => 3,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -196,6 +213,7 @@ class SampleDataSeeder extends Seeder
             'description' => '330ml κουτάκι',
             'category_id' => $anapsiktika->id,
             'sort_order' => 4,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -204,6 +222,7 @@ class SampleDataSeeder extends Seeder
             'description' => '330ml κουτάκι',
             'category_id' => $anapsiktika->id,
             'sort_order' => 5,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -212,6 +231,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Ανθρακούχο φυσικό μεταλλικό νερό',
             'category_id' => $anapsiktika->id,
             'sort_order' => 6,
+            'is_active' => true,
         ]);
 
         Item::create([
@@ -220,6 +240,7 @@ class SampleDataSeeder extends Seeder
             'description' => 'Εμφιαλωμένο νερό 1.5 λίτρων',
             'category_id' => $anapsiktika->id,
             'sort_order' => 7,
+            'is_active' => true,
         ]);
     }
 }

@@ -47,6 +47,10 @@ class ItemResource extends Resource
                     ->numeric()
                     ->default(0)
                     ->required(),
+                Forms\Components\Toggle::make('is_active')
+                    ->label('Active')
+                    ->default(true)
+                    ->required(),
             ]);
     }
 
@@ -70,6 +74,10 @@ class ItemResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -79,6 +87,11 @@ class ItemResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
                     ->relationship('category', 'name'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active Status')
+                    ->placeholder('All items')
+                    ->trueLabel('Active only')
+                    ->falseLabel('Inactive only'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

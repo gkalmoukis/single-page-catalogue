@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('price', 8, 2);
             $table->text('description')->nullable();
             $table->integer('sort_order')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
