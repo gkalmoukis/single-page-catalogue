@@ -5,7 +5,6 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\TagResource\Pages;
 use App\Filament\Admin\Resources\TagResource\RelationManagers;
 use App\Models\Tag;
-use App\Services\TenantService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,10 +17,10 @@ class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
-
-    protected static ?string $navigationGroup = 'Restaurant Management';
-
+    protected static ?string $navigationIcon = 'heroicon-o-hashtag';
+    
+    protected static ?string $navigationGroup = 'Content Management';
+    
     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
@@ -33,19 +32,14 @@ class TagResource extends Resource
                     ->relationship('tenant', 'name')
                     ->required()
                     ->searchable()
-                    ->preload()
-                    ->disabled(fn() => !auth()->user()->is_admin)
-                    ->default(fn() => auth()->user()->is_admin ? null : auth()->user()->tenants->first()?->id),
+                    ->preload(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\ColorPicker::make('color')
-                    ->required()
-                    ->default('#6B7280'),
-                Forms\Components\TextInput::make('sort_order')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
+                    ->helperText('Color for display purposes'),
+                Forms\Components\Toggle::make('is_active')
+                    ->default(true),
             ]);
     }
 
@@ -57,23 +51,22 @@ class TagResource extends Resource
                     ->label('Restaurant')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\ColorColumn::make('color')
-                    ->label('Color'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\ColorColumn::make('color'),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
-                    ->label('Items'),
-                Tables\Columns\TextColumn::make('sort_order')
-                    ->numeric()
+                    ->label('Items')
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('tenant.name')
             ->filters([
                 Tables\Filters\SelectFilter::make('tenant_id')
                     ->label('Restaurant')
@@ -83,7 +76,6 @@ class TagResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -108,18 +100,9 @@ class TagResource extends Resource
         ];
     }
 
-    // Admin access to all tenant data
+    // Admin users can see all data across all tenants
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery()->with('tenant');
-        
-        // Admin users can see all data
-        if (auth()->user()->is_admin) {
-            return $query;
-        }
-        
-        // Regular users can only see data from their associated tenants
-        $userTenantIds = auth()->user()->tenants->pluck('id');
-        return $query->whereIn('tenant_id', $userTenantIds);
+        return parent::getEloquentQuery()->with('tenant');
     }
 }

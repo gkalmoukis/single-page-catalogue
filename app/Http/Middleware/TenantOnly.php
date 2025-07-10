@@ -5,8 +5,9 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
-class AdminOnly
+class TenantOnly
 {
     /**
      * Handle an incoming request.
@@ -16,13 +17,13 @@ class AdminOnly
     public function handle(Request $request, Closure $next): Response
     {
         // Check if user is authenticated
-        if (!auth()->check()) {
-            return redirect()->route('filament.admin.auth.login');
+        if (!Auth::check()) {
+            return redirect()->route('filament.tenant.auth.login');
         }
 
-        // Check if user is an admin
-        if (!auth()->user()->is_admin) {
-            abort(403, 'Access denied. Admin privileges required.');
+        // Check if user has access to at least one tenant (non-admin users)
+        if (!Auth::user()->is_admin && Auth::user()->tenants->isEmpty()) {
+            abort(403, 'Access denied. You must be assigned to at least one tenant.');
         }
 
         return $next($request);

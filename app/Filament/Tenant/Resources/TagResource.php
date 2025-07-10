@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Tenant\Resources;
 
-use App\Filament\Admin\Resources\CategoryResource\Pages;
-use App\Filament\Admin\Resources\CategoryResource\RelationManagers;
-use App\Models\Category;
+use App\Filament\Tenant\Resources\TagResource\Pages;
+use App\Filament\Tenant\Resources\TagResource\RelationManagers;
+use App\Models\Tag;
+use App\Services\TenantService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,15 +14,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CategoryResource extends Resource
+class TagResource extends Resource
 {
-    protected static ?string $model = Category::class;
+    protected static ?string $model = Tag::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
-    
-    protected static ?string $navigationGroup = 'Content Management';
-    
-    protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationGroup = 'Catalog Management';
+
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -32,22 +33,20 @@ class CategoryResource extends Resource
                     ->relationship('tenant', 'name')
                     ->required()
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->default(fn() => auth()->user()->tenants->first()?->id)
+                    ->disabled()
+                    ->dehydrated(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->maxLength(1000)
-                    ->rows(3),
-                Forms\Components\TextInput::make('emoji')
-                    ->maxLength(255)
-                    ->placeholder('🍕'),
+                Forms\Components\ColorPicker::make('color')
+                    ->required()
+                    ->default('#6B7280'),
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric()
                     ->default(0)
                     ->required(),
-                Forms\Components\Toggle::make('is_active')
-                    ->default(true),
             ]);
     }
 
@@ -55,26 +54,16 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('tenant.name')
-                    ->label('Restaurant')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('emoji')
-                    ->searchable()
-                    ->sortable(),
+                Tables\Columns\ColorColumn::make('color')
+                    ->label('Color'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->limit(50)
-                    ->searchable()
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
-                    ->label('Items')
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean()
+                    ->label('Items'),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -82,14 +71,11 @@ class CategoryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('tenant_id')
-                    ->label('Restaurant')
-                    ->relationship('tenant', 'name')
-                    ->searchable()
-                    ->preload(),
+                // Remove tenant filter since users only see their own tenant data
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -108,15 +94,19 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'index' => Pages\ListTags::route('/'),
+            'create' => Pages\CreateTag::route('/create'),
+            'edit' => Pages\EditTag::route('/{record}/edit'),
         ];
     }
 
-    // Admin users can see all data across all tenants
+    // Tenant users can only see data from their assigned tenants
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('tenant');
+        $query = parent::getEloquentQuery();
+        
+        // Get user's tenant IDs
+        $userTenantIds = auth()->user()->tenants->pluck('id');
+        return $query->whereIn('tenant_id', $userTenantIds);
     }
 }

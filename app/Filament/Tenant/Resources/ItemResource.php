@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Tenant\Resources;
 
-use App\Filament\Admin\Resources\ItemResource\Pages;
-use App\Filament\Admin\Resources\ItemResource\RelationManagers;
+use App\Filament\Tenant\Resources\ItemResource\Pages;
+use App\Filament\Tenant\Resources\ItemResource\RelationManagers;
 use App\Models\Item;
+use App\Services\TenantService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,16 +13,26 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\Category;
 
 class ItemResource extends Resource
 {
     protected static ?string $model = Item::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cube';
-    
-    protected static ?string $navigationGroup = 'Content Management';
-    
+    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+
+    protected static ?string $navigationGroup = 'Catalog Management';
+
     protected static ?int $navigationSort = 2;
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->with(['tenant', 'category']);
+        
+        // Tenant users can only see data from their assigned tenants
+        $userTenantIds = auth()->user()->tenants->pluck('id');
+        return $query->whereIn('tenant_id', $userTenantIds);
+    }
 
     public static function form(Form $form): Form
     {
@@ -32,33 +43,44 @@ class ItemResource extends Resource
                     ->relationship('tenant', 'name')
                     ->required()
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->default(fn() => auth()->user()->tenants->first()?->id)
+                    ->disabled()
+                    ->dehydrated(),
                 Forms\Components\Select::make('category_id')
                     ->label('Category')
-                    ->relationship('category', 'name')
+                    ->relationship('category', 'name', fn(Builder $query) => 
+                        $query->whereIn('tenant_id', auth()->user()->tenants->pluck('id'))
+                    )
                     ->required()
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\Select::make('tags')
+                    ->relationship('tags', 'name', fn(Builder $query) => 
+                        $query->whereIn('tenant_id', auth()->user()->tenants->pluck('id'))
+                    )
+                    ->multiple()
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->maxLength(1000)
-                    ->rows(3),
                 Forms\Components\TextInput::make('price')
+                    ->required()
                     ->numeric()
-                    ->prefix('$')
+                    ->prefix('€')
                     ->step(0.01),
-                Forms\Components\Select::make('tags')
-                    ->relationship('tags', 'name')
-                    ->multiple()
-                    ->preload(),
+                Forms\Components\Textarea::make('description')
+                    ->rows(3)
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric()
                     ->default(0)
                     ->required(),
                 Forms\Components\Toggle::make('is_active')
-                    ->default(true),
+                    ->label('Active')
+                    ->default(true)
+                    ->required(),
             ]);
     }
 
@@ -66,10 +88,6 @@ class ItemResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('tenant.name')
-                    ->label('Restaurant')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Category')
                     ->searchable()
@@ -78,13 +96,16 @@ class ItemResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->money('USD')
+                    ->money('EUR')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tags.name')
-                    ->badge()
-                    ->separator(',')
-                    ->limit(3),
+                Tables\Columns\TextColumn::make('description')
+                    ->limit(50)
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -93,16 +114,20 @@ class ItemResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('tenant_id')
-                    ->label('Restaurant')
-                    ->relationship('tenant', 'name')
-                    ->searchable()
-                    ->preload(),
                 Tables\Filters\SelectFilter::make('category')
-                    ->relationship('category', 'name'),
+                    ->relationship('category', 'name', fn(Builder $query) => 
+                        $query->whereIn('tenant_id', auth()->user()->tenants->pluck('id'))
+                    ),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active Status')
+                    ->placeholder('All items')
+                    ->trueLabel('Active only')
+                    ->falseLabel('Inactive only'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -114,7 +139,7 @@ class ItemResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\TagsRelationManager::class,
         ];
     }
 
@@ -123,13 +148,8 @@ class ItemResource extends Resource
         return [
             'index' => Pages\ListItems::route('/'),
             'create' => Pages\CreateItem::route('/create'),
+            'view' => Pages\ViewItem::route('/{record}'),
             'edit' => Pages\EditItem::route('/{record}/edit'),
         ];
-    }
-
-    // Admin users can see all data across all tenants
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->with(['tenant', 'category']);
     }
 }
