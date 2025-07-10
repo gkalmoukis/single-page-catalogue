@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Name – Discover Our Menu</title>
+    <title>Μενού | Ο,τι θέλεις</title>
     <style>
         * {
             margin: 0;
@@ -111,36 +111,6 @@
             margin-left: 20px;
         }
 
-        .cta-section {
-            text-align: center;
-            padding: 30px 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            transition: background-color 0.2s ease;
-        }
-
-        .cta-button:hover {
-            background: #0056b3;
-        }
-
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -167,15 +137,6 @@
                 margin-top: 8px;
                 text-align: right;
             }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .cta-button {
-                width: 200px;
-            }
         }
     </style>
 </head>
@@ -183,8 +144,8 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <h1>Welcome to Our Restaurant</h1>
-            <p>Serving delicious food made with love.</p>
+            <h1>{{ __('Ο,τι θέλεις Ευριπίδου 18') }}</h1>
+            <p>{{ __('Ζεστές λιχουδίες καθημερινά, μαγειρευτά και ψητά.') }}</p>
         </div>
 
         <!-- Catalogue Section -->
@@ -221,7 +182,7 @@
                         @else
                             <div class="items">
                                 <div class="empty-state">
-                                    <p>No items available in this category yet.</p>
+                                    <p>{{ __('Δεν υπάρχουν προϊόντα σε αυτή την κατηγορία ακόμα.') }}</p>
                                 </div>
                             </div>
                         @endif
@@ -229,19 +190,10 @@
                 @endforeach
             @else
                 <div class="empty-state">
-                    <h3>Menu Coming Soon!</h3>
-                    <p>We're preparing our delicious menu for you. Please check back soon!</p>
+                    <h3>{{ __('Ετοιμάζουμε το νόστιμο μενού μας για εσάς.') }}</h3>
+                    <p>{{ __(' Παρακαλούμε ελέγξτε ξανά σύντομα!') }}</p>
                 </div>
             @endif
-        </div>
-
-        <!-- Call-to-Actions Section -->
-        <div class="cta-section">
-            <div class="cta-buttons">
-                <a href="tel:+1234567890" class="cta-button">Call Us</a>
-                <a href="#" class="cta-button">Find Us</a>
-                <a href="https://maps.google.com/maps?q=restaurant+near+me" target="_blank" class="cta-button">Get Directions</a>
-            </div>
         </div>
     </div>
 </body>
