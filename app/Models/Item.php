@@ -23,17 +23,6 @@ class Item extends Model
         'is_active' => 'boolean',
     ];
 
-    protected static function booted()
-    {
-        static::saved(function () {
-            Cache::forget(config('default.catalogue_cache_key'));
-        });
-
-        static::deleted(function () {
-            Cache::forget(config('default.catalogue_cache_key'));
-        });
-    }
-
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
@@ -42,6 +31,7 @@ class Item extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class)
+            ->using(ItemTag::class)
             ->withPivot('sort_order')
             ->withTimestamps();
     }
@@ -54,5 +44,16 @@ class Item extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    protected static function booted()
+    {
+        static::saved(function () {
+            Cache::forget(config('default.catalogue_cache_key'));
+        });
+
+        static::deleted(function () {
+            Cache::forget(config('default.catalogue_cache_key'));
+        });
     }
 }
