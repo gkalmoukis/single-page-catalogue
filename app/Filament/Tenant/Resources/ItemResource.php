@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
 class ItemResource extends Resource
 {
@@ -29,8 +30,16 @@ class ItemResource extends Resource
     {
         $query = parent::getEloquentQuery()->with(['tenant', 'category']);
         
-        // Tenant users can only see data from their assigned tenants
-        $userTenantIds = auth()->user()->tenants->pluck('id');
+        // Use TenantService to scope to current tenant
+        $tenantService = app(TenantService::class);
+        $currentTenant = $tenantService->getCurrentTenant();
+        
+        if ($currentTenant) {
+            return $query->where('tenant_id', $currentTenant->id);
+        }
+        
+        // Fallback: Tenant users can only see data from their assigned tenants
+        $userTenantIds = Auth::user()->tenants->pluck('id');
         return $query->whereIn('tenant_id', $userTenantIds);
     }
 
@@ -44,21 +53,43 @@ class ItemResource extends Resource
                     ->required()
                     ->searchable()
                     ->preload()
-                    ->default(fn() => auth()->user()->tenants->first()?->id)
+                    ->default(function () {
+                        $tenantService = app(TenantService::class);
+                        $currentTenant = $tenantService->getCurrentTenant();
+                        return $currentTenant?->id ?? Auth::user()->tenants->first()?->id;
+                    })
                     ->disabled()
                     ->dehydrated(),
                 Forms\Components\Select::make('category_id')
                     ->label('Category')
-                    ->relationship('category', 'name', fn(Builder $query) => 
-                        $query->whereIn('tenant_id', auth()->user()->tenants->pluck('id'))
-                    )
+                    ->relationship('category', 'name', function (Builder $query) {
+                        $tenantService = app(TenantService::class);
+                        $currentTenant = $tenantService->getCurrentTenant();
+                        
+                        if ($currentTenant) {
+                            $query->where('tenant_id', $currentTenant->id);
+                        } else {
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('tenant_id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->required()
                     ->searchable()
                     ->preload(),
                 Forms\Components\Select::make('tags')
-                    ->relationship('tags', 'name', fn(Builder $query) => 
-                        $query->whereIn('tenant_id', auth()->user()->tenants->pluck('id'))
-                    )
+                    ->relationship('tags', 'name', function (Builder $query) {
+                        $tenantService = app(TenantService::class);
+                        $currentTenant = $tenantService->getCurrentTenant();
+                        
+                        if ($currentTenant) {
+                            $query->where('tenant_id', $currentTenant->id);
+                        } else {
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('tenant_id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->multiple()
                     ->searchable()
                     ->preload(),
@@ -115,9 +146,18 @@ class ItemResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
-                    ->relationship('category', 'name', fn(Builder $query) => 
-                        $query->whereIn('tenant_id', auth()->user()->tenants->pluck('id'))
-                    ),
+                    ->relationship('category', 'name', function (Builder $query) {
+                        $tenantService = app(TenantService::class);
+                        $currentTenant = $tenantService->getCurrentTenant();
+                        
+                        if ($currentTenant) {
+                            $query->where('tenant_id', $currentTenant->id);
+                        } else {
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('tenant_id', $userTenantIds);
+                        }
+                        return $query;
+                    }),
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active Status')
                     ->placeholder('All items')

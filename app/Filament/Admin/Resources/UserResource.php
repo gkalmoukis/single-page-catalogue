@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
@@ -45,7 +46,14 @@ class UserResource extends Resource
                     ->label('Admin User')
                     ->helperText('Admin users can access the admin dashboard and manage all tenants'),
                 Forms\Components\Select::make('tenants')
-                    ->relationship('tenants', 'name')
+                    ->relationship('tenants', 'name', function (Builder $query) {
+                        // Non-admin users can only see their assigned tenants
+                        if (!Auth::user()->is_admin) {
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->multiple()
                     ->preload()
                     ->hidden(fn (Forms\Get $get) => $get('is_admin'))
@@ -63,15 +71,15 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('tenants.name')
+                    ->badge()
+                    ->separator(',')
+                    ->limit(3)
+                    ->label('Tenants'),
                 Tables\Columns\IconColumn::make('is_admin')
                     ->boolean()
                     ->label('Admin')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tenants.name')
-                    ->label('Tenants')
-                    ->badge()
-                    ->separator(',')
-                    ->limit(3),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -80,9 +88,10 @@ class UserResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_admin')
                     ->label('Admin Users')
-                    ->placeholder('All users')
-                    ->trueLabel('Admin only')
-                    ->falseLabel('Non-admin only'),
+                    ->boolean()
+                    ->trueLabel('Admin users only')
+                    ->falseLabel('Non-admin users only')
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -108,5 +117,21 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    // Admin users can see all users, non-admin users can only see users from their tenants
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->with(['tenants']);
+        
+        // If user is not an admin, scope to users who belong to the same tenants
+        if (!Auth::user()->is_admin) {
+            $userTenantIds = Auth::user()->tenants->pluck('id');
+            $query->whereHas('tenants', function (Builder $query) use ($userTenantIds) {
+                $query->whereIn('tenant_id', $userTenantIds);
+            });
+        }
+        
+        return $query;
     }
 }

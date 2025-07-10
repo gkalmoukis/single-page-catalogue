@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class TagResource extends Resource
 {
@@ -29,7 +30,14 @@ class TagResource extends Resource
             ->schema([
                 Forms\Components\Select::make('tenant_id')
                     ->label('Restaurant')
-                    ->relationship('tenant', 'name')
+                    ->relationship('tenant', 'name', function (Builder $query) {
+                        // Non-admin users can only see their assigned tenants
+                        if (!Auth::user()->is_admin) {
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->required()
                     ->searchable()
                     ->preload(),
@@ -70,7 +78,13 @@ class TagResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('tenant_id')
                     ->label('Restaurant')
-                    ->relationship('tenant', 'name')
+                    ->relationship('tenant', 'name', function (Builder $query) {
+                        if (!Auth::user()->is_admin) {
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->searchable()
                     ->preload(),
             ])
@@ -100,9 +114,17 @@ class TagResource extends Resource
         ];
     }
 
-    // Admin users can see all data across all tenants
+    // Admin users can see all data across all tenants, non-admin users see only their tenant data
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('tenant');
+        $query = parent::getEloquentQuery()->with(['tenant']);
+        
+        // If user is not an admin, scope to their tenants
+        if (!Auth::user()->is_admin) {
+            $userTenantIds = Auth::user()->tenants->pluck('id');
+            $query->whereIn('tenant_id', $userTenantIds);
+        }
+        
+        return $query;
     }
 }

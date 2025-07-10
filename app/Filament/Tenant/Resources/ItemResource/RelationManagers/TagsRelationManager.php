@@ -9,6 +9,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Services\TenantService;
+use Illuminate\Support\Facades\Auth;
 
 class TagsRelationManager extends RelationManager
 {
@@ -53,7 +55,21 @@ class TagsRelationManager extends RelationManager
                         ->schema([
                             Forms\Components\Select::make('recordId')
                                 ->label('Tag')
-                                ->options(\App\Models\Tag::all()->pluck('name', 'id'))
+                                ->options(function () {
+                                    // Get current tenant using TenantService
+                                    $tenantService = app(TenantService::class);
+                                    $currentTenant = $tenantService->getCurrentTenant();
+                                    
+                                    if ($currentTenant) {
+                                        return \App\Models\Tag::where('tenant_id', $currentTenant->id)
+                                            ->pluck('name', 'id');
+                                    }
+                                    
+                                    // Fallback: get tags from user's assigned tenants
+                                    $userTenantIds = Auth::user()->tenants->pluck('id');
+                                    return \App\Models\Tag::whereIn('tenant_id', $userTenantIds)
+                                        ->pluck('name', 'id');
+                                })
                                 ->required()
                                 ->searchable(),
                         ])

@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryResource extends Resource
 {
@@ -24,6 +25,23 @@ class CategoryResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->with(['tenant']);
+        
+        // Use TenantService to scope to current tenant
+        $tenantService = app(TenantService::class);
+        $currentTenant = $tenantService->getCurrentTenant();
+        
+        if ($currentTenant) {
+            return $query->where('tenant_id', $currentTenant->id);
+        }
+        
+        // Fallback: Tenant users can only see data from their assigned tenants
+        $userTenantIds = Auth::user()->tenants->pluck('id');
+        return $query->whereIn('tenant_id', $userTenantIds);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -34,7 +52,11 @@ class CategoryResource extends Resource
                     ->required()
                     ->searchable()
                     ->preload()
-                    ->default(fn() => auth()->user()->tenants->first()?->id)
+                    ->default(function () {
+                        $tenantService = app(TenantService::class);
+                        $currentTenant = $tenantService->getCurrentTenant();
+                        return $currentTenant?->id ?? Auth::user()->tenants->first()?->id;
+                    })
                     ->disabled()
                     ->dehydrated(),
                 Forms\Components\TextInput::make('name')
@@ -111,15 +133,5 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
-    }
-
-    // Tenant users can only see data from their assigned tenants
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery();
-        
-        // Get user's tenant IDs
-        $userTenantIds = auth()->user()->tenants->pluck('id');
-        return $query->whereIn('tenant_id', $userTenantIds);
     }
 }

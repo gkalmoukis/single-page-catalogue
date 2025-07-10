@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\ItemResource\Pages;
 use App\Filament\Admin\Resources\ItemResource\RelationManagers;
 use App\Models\Item;
+use App\Services\TenantService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class ItemResource extends Resource
 {
@@ -29,13 +31,35 @@ class ItemResource extends Resource
             ->schema([
                 Forms\Components\Select::make('tenant_id')
                     ->label('Restaurant')
-                    ->relationship('tenant', 'name')
+                    ->relationship('tenant', 'name', function (Builder $query) {
+                        // Non-admin users can only see their assigned tenants
+                        if (!Auth::user()->is_admin) {
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->required()
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set) {
+                        $set('category_id', null);
+                        $set('tags', []);
+                    }),
                 Forms\Components\Select::make('category_id')
                     ->label('Category')
-                    ->relationship('category', 'name')
+                    ->relationship('category', 'name', function (Builder $query, Forms\Get $get) {
+                        $tenantId = $get('tenant_id');
+                        if ($tenantId) {
+                            $query->where('tenant_id', $tenantId);
+                        } else if (!Auth::user()->is_admin) {
+                            // For non-admin users, scope to their tenants
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('tenant_id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->required()
                     ->searchable()
                     ->preload(),
@@ -50,7 +74,17 @@ class ItemResource extends Resource
                     ->prefix('$')
                     ->step(0.01),
                 Forms\Components\Select::make('tags')
-                    ->relationship('tags', 'name')
+                    ->relationship('tags', 'name', function (Builder $query, Forms\Get $get) {
+                        $tenantId = $get('tenant_id');
+                        if ($tenantId) {
+                            $query->where('tenant_id', $tenantId);
+                        } else if (!Auth::user()->is_admin) {
+                            // For non-admin users, scope to their tenants
+                            $userTenantIds = Auth::user()->tenants->pluck('id');
+                            $query->whereIn('tenant_id', $userTenantIds);
+                        }
+                        return $query;
+                    })
                     ->multiple()
                     ->preload(),
                 Forms\Components\TextInput::make('sort_order')
@@ -127,9 +161,17 @@ class ItemResource extends Resource
         ];
     }
 
-    // Admin users can see all data across all tenants
+    // Admin users can see all data across all tenants, non-admin users see only their tenant data
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['tenant', 'category']);
+        $query = parent::getEloquentQuery()->with(['tenant', 'category']);
+        
+        // If user is not an admin, scope to their tenants
+        if (!Auth::user()->is_admin) {
+            $userTenantIds = Auth::user()->tenants->pluck('id');
+            $query->whereIn('tenant_id', $userTenantIds);
+        }
+        
+        return $query;
     }
 }
