@@ -158,7 +158,7 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <h1>{{ __('Kitchen @ THE LOOM SFT') }}</h1>
+            <h1>{{ config('app.name') }}</h1>
             <p>{{ __('Φάτε μπρόκολα.') }}</p>
         </div>
 
@@ -216,6 +216,12 @@
                 </div>
             @endif
         </div>
+
+        <!-- Footer Section -->
+        <footer style="text-align: center; padding: 20px; margin-top: 40px; color: #666; font-size: 0.85rem; border-top: 1px solid #e9ecef;">
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}.</p>
+            <p style="margin-top: 5px;">Developed by <a href="https://theloom.gr" target="_blank" style="color: #666; text-decoration: none;">theloom.gr</a></p>
+        </footer>
     </div>
 </body>
 </html>
