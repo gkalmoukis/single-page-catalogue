@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Μενού | Ο,τι θέλεις</title>
+    <title>Μενού | {{ config('app.name') }}</title>
     <style>
         * {
             margin: 0;
@@ -144,8 +144,8 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <h1>{{ __('Ο,τι θέλεις Ευριπίδου 18') }}</h1>
-            <p>{{ __('Ζεστές λιχουδίες καθημερινά, μαγειρευτά και ψητά.') }}</p>
+            <h1>{{ __('Kitchen @ THE LOOM SFT') }}</h1>
+            <p>{{ __('Φάτε μπρόκολα.') }}</p>
         </div>
 
         <!-- Catalogue Section -->
