@@ -46,7 +46,7 @@ class Tenant extends Model
 
     public function getFullDomainAttribute(): string
     {
-        return $this->domain ?: $this->slug . '.single-page-catalogue.theloom.gr';
+        return config('app.url') . '/t/' . $this->slug;
     }
 
     public function scopeActive($query)
