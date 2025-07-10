@@ -28,11 +28,6 @@ class Category extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(Item::class)->active()->orderBy('sort_order');
-    }
-
-    public function allItems(): HasMany
-    {
-        return $this->hasMany(Item::class)->orderBy('sort_order');
+        return $this->hasMany(Item::class);
     }
 }
