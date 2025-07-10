@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\Tag;
 
 class SampleDataSeeder extends Seeder
 {
@@ -242,5 +243,88 @@ class SampleDataSeeder extends Seeder
             'sort_order' => 7,
             'is_active' => true,
         ]);
+
+        // Δημιουργία Tags
+        $veganTag = Tag::create([
+            'name' => 'Βίγκαν',
+            'color' => '#22C55E', // Green
+            'sort_order' => 1,
+        ]);
+
+        $vegetarianTag = Tag::create([
+            'name' => 'Χορτοφαγικό',
+            'color' => '#84CC16', // Light green
+            'sort_order' => 2,
+        ]);
+
+        $glutenFreeTag = Tag::create([
+            'name' => 'Χωρίς Γλουτένη',
+            'color' => '#F59E0B', // Amber
+            'sort_order' => 3,
+        ]);
+
+        // Σύνδεση tags με items
+        // Σαλάτες - όλες χορτοφαγικές
+        $choriatiki = Item::where('name', 'Χωριάτικη')->first();
+        $choriatiki->tags()->attach($vegetarianTag->id, ['sort_order' => 1]);
+        $choriatiki->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $taboule = Item::where('name', 'Ταμπουλέ')->first();
+        $taboule->tags()->attach($veganTag->id, ['sort_order' => 1]);
+
+        // Καφέδες - όλοι βίγκαν εκτός από freddo cappuccino
+        $freddoEspresso = Item::where('name', 'Freddo Espresso')->first();
+        $freddoEspresso->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $freddoEspresso->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $gallikos = Item::where('name', 'Γαλλικός')->first();
+        $gallikos->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $gallikos->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $frape = Item::where('name', 'Φραπεδάκι')->first();
+        $frape->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $frape->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $ellinikos = Item::where('name', 'Ελληνικός')->first();
+        $ellinikos->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $ellinikos->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        // Freddo Cappuccino - χορτοφαγικό (όχι βίγκαν λόγω γάλακτος)
+        $freddoCappuccino = Item::where('name', 'Freddo Cappuccino')->first();
+        $freddoCappuccino->tags()->attach($vegetarianTag->id, ['sort_order' => 1]);
+        $freddoCappuccino->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        // Αναψυκτικά - όλα βίγκαν και χωρίς γλουτένη
+        $cocaColaZero = Item::where('name', 'Coca Cola Zero')->first();
+        $cocaColaZero->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $cocaColaZero->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $cocaColaLight = Item::where('name', 'Coca Cola Light')->first();
+        $cocaColaLight->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $cocaColaLight->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $cocaCola = Item::where('name', 'Coca Cola')->first();
+        $cocaCola->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $cocaCola->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $fanta = Item::where('name', 'Fanta')->first();
+        $fanta->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $fanta->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $sprite = Item::where('name', 'Sprite')->first();
+        $sprite->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $sprite->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $anthrakoucho = Item::where('name', 'Ανθρακούχο Νερό')->first();
+        $anthrakoucho->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $anthrakoucho->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        $nero = Item::where('name', 'Νερό 1.4L')->first();
+        $nero->tags()->attach($veganTag->id, ['sort_order' => 1]);
+        $nero->tags()->attach($glutenFreeTag->id, ['sort_order' => 2]);
+
+        // Κοτόπουλο - χωρίς γλουτένη
+        $kotopouloFileto = Item::where('name', 'Κοτόπουλο Φιλέτο Σχάρας')->first();
+        $kotopouloFileto->tags()->attach($glutenFreeTag->id, ['sort_order' => 1]);
     }
 }

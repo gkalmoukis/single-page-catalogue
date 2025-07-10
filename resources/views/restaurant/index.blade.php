@@ -104,6 +104,20 @@
             font-size: 0.9rem;
         }
 
+        .item-tags {
+            margin-top: 5px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 2px 4px 2px 0;
+            font-size: 0.75rem;
+            color: white;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
         .item-price {
             font-size: 1.1rem;
             font-weight: 600;
@@ -173,6 +187,13 @@
                                             <div class="item-name">{{ $item->name }}</div>
                                             @if($item->description)
                                                 <div class="item-description">{{ $item->description }}</div>
+                                            @endif
+                                            @if($item->tags && $item->tags->count() > 0)
+                                                <div class="item-tags">
+                                                    @foreach($item->tags as $tag)
+                                                        <span class="tag" style="background-color: {{ $tag->color }};">{{ $tag->name }}</span>
+                                                    @endforeach
+                                                </div>
                                             @endif
                                         </div>
                                         <div class="item-price">{{ number_format($item->price, 2, ',', '.') }} €</div>

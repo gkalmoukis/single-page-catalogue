@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;
 
 class Item extends Model
@@ -36,6 +37,18 @@ class Item extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class)
+            ->withPivot('sort_order')
+            ->withTimestamps();
+    }
+
+    public function tagsOrdered(): BelongsToMany
+    {
+        return $this->tags()->orderBy('item_tag.sort_order');
     }
 
     public function scopeActive($query)

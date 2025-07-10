@@ -16,7 +16,9 @@ class RestaurantController extends Controller
                 config('default.catalogue_cache_ttl'), 
                 function () {
                     return Category::with([
-                        'items' => fn ($query) => $query->active()->orderBy('sort_order')])
+                        'items' => fn ($query) => $query->active()
+                            ->with('tags')
+                            ->orderBy('sort_order')])
                             ->orderBy('sort_order')
                             ->get();
                 }
