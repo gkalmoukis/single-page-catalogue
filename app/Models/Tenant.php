@@ -69,7 +69,15 @@ class Tenant extends Model implements HasMedia
             ->height(225)
             ->sharpen(10)
             ->optimize()
-            ->format('webp') // Use WebP for better compression
+            ->performOnCollections('logo')
+            ->nonQueued(); // Keep original format for QR code overlay
+
+        $this->addMediaConversion('medium-webp')
+            ->width(400)
+            ->height(225)
+            ->sharpen(10)
+            ->optimize()
+            ->format('webp') // WebP version for web display
             ->nonQueued();
 
         $this->addMediaConversion('large')

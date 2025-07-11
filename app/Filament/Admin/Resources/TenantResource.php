@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\TenantResource\Pages;
 use App\Filament\Admin\Resources\TenantResource\RelationManagers;
 use App\Models\Tenant;
+use App\Services\QrCodeService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -205,59 +206,47 @@ class TenantResource extends Resource
                             })
                             ->visible(fn ($record) => $record && $record->slug),
                         
-                        Forms\Components\Actions::make([
-                            Forms\Components\Actions\Action::make('generate_qr_code')
-                                ->label('Generate QR Code')
-                                ->icon('heroicon-o-qr-code')
-                                ->color('success')
-                                ->size(ActionSize::Medium)
-                                ->modalHeading(fn ($record) => "QR Code for {$record->name}")
-                                ->modalContent(function ($record) {
-                                    if (!$record || !$record->slug) {
-                                        return 'Please save the tenant first to generate QR code';
-                                    }
+                        Forms\Components\Placeholder::make('qr_code_generator')
+                            ->label('QR Code')
+                            ->content(function ($record) {
+                                if (!$record || !$record->slug) {
+                                    return new \Illuminate\Support\HtmlString(
+                                        '<p class="text-sm text-gray-500">Save the tenant first to generate QR code</p>'
+                                    );
+                                }
+                                
+                                try {
+                                    $qrCodeService = app(\App\Services\QrCodeService::class);
+                                    $qrCode = $qrCodeService->generateWithLogo($record, 'svg', 200);
                                     
                                     $url = url("/t/{$record->slug}");
-                                    $qrCode = app(\SimpleSoftwareIO\QrCode\Generator::class)->format('svg')
-                                        ->size(250)
-                                        ->errorCorrection('M')
-                                        ->generate($url);
+                                    $hasLogo = $record->hasLogo();
                                     
                                     return new \Illuminate\Support\HtmlString(
-                                        '<div class="text-center space-y-4">' .
-                                        '<div class="flex justify-center">' . $qrCode . '</div>' .
-                                        '<div class="text-sm text-gray-600 dark:text-gray-400">' .
-                                        '<p class="font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded">' . $url . '</p>' .
+                                        '<div class="space-y-4">' .
+                                        '<div class="flex justify-center bg-white p-4 rounded-lg border">' . 
+                                        $qrCode . 
+                                        '</div>' .
+                                        '<div class="text-center text-sm text-gray-600 dark:text-gray-400">' .
+                                        '<p class="font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs">' . $url . '</p>' .
                                         '<p class="mt-2">Scan this QR code to visit the homepage</p>' .
+                                        ($hasLogo ? '<p class="text-xs text-green-600 dark:text-green-400 mt-1">✓ QR code includes your logo</p>' : '<p class="text-xs text-gray-500 mt-1">Upload a logo to include it in the QR code</p>') .
+                                        '</div>' .
+                                        '<div class="flex justify-center">' .
+                                        '<a href="' . route('filament.admin.resources.tenants.download-qr', $record) . '" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">' .
+                                        '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>' .
+                                        'Download PNG' .
+                                        '</a>' .
                                         '</div>' .
                                         '</div>'
                                     );
-                                })
-                                ->modalActions([
-                                    Forms\Components\Actions\Action::make('download')
-                                        ->label('Download PNG')
-                                        ->icon('heroicon-o-arrow-down-tray')
-                                        ->action(function ($record) {
-                                            $url = url("/t/{$record->slug}");
-                                            $qrCode = app(\SimpleSoftwareIO\QrCode\Generator::class)->format('png')
-                                                ->size(300)
-                                                ->errorCorrection('M')
-                                                ->generate($url);
-                                            
-                                            $filename = "qr-code-{$record->slug}.png";
-                                            
-                                            return response($qrCode)
-                                                ->header('Content-Type', 'image/png')
-                                                ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
-                                        }),
-                                    Forms\Components\Actions\Action::make('close')
-                                        ->label('Close')
-                                        ->color('gray')
-                                        ->action(fn () => null),
-                                ])
-                                ->visible(fn ($record) => $record && $record->slug),
-                        ])
-                        ->visible(fn ($record) => $record && $record->slug),
+                                } catch (\Exception $e) {
+                                    return new \Illuminate\Support\HtmlString(
+                                        '<p class="text-sm text-red-500">Error generating QR code: ' . $e->getMessage() . '</p>'
+                                    );
+                                }
+                            })
+                            ->visible(fn ($record) => $record && $record->slug),
                     ])
                     ->visible(fn ($record) => $record && $record->slug),
             ]);
@@ -335,11 +324,11 @@ class TenantResource extends Resource
                     ->color('success')
                     ->modalHeading(fn ($record) => "QR Code for {$record->name}")
                     ->modalContent(function ($record) {
+                        $qrCodeService = app(QrCodeService::class);
+                        $qrCode = $qrCodeService->generateWithLogo($record, 'svg', 250);
+                        
                         $url = url("/t/{$record->slug}");
-                        $qrCode = app(\SimpleSoftwareIO\QrCode\Generator::class)->format('svg')
-                            ->size(250)
-                            ->errorCorrection('M')
-                            ->generate($url);
+                        $hasLogo = $record->hasLogo();
                         
                         return new \Illuminate\Support\HtmlString(
                             '<div class="text-center space-y-4">' .
@@ -347,6 +336,7 @@ class TenantResource extends Resource
                             '<div class="text-sm text-gray-600 dark:text-gray-400">' .
                             '<p class="font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded">' . $url . '</p>' .
                             '<p class="mt-2">Scan this QR code to visit the homepage</p>' .
+                            ($hasLogo ? '<p class="text-xs text-green-600 dark:text-green-400 mt-1">✓ QR code includes your logo</p>' : '<p class="text-xs text-gray-500 mt-1">Upload a logo to include it in the QR code</p>') .
                             '</div>' .
                             '</div>'
                         );
@@ -355,19 +345,8 @@ class TenantResource extends Resource
                         Tables\Actions\Action::make('download')
                             ->label('Download PNG')
                             ->icon('heroicon-o-arrow-down-tray')
-                            ->action(function ($record) {
-                                $url = url("/t/{$record->slug}");
-                                $qrCode = app(\SimpleSoftwareIO\QrCode\Generator::class)->format('png')
-                                    ->size(300)
-                                    ->errorCorrection('M')
-                                    ->generate($url);
-                                
-                                $filename = "qr-code-{$record->slug}.png";
-                                
-                                return response($qrCode)
-                                    ->header('Content-Type', 'image/png')
-                                    ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
-                            }),
+                            ->url(fn ($record) => route('filament.admin.resources.tenants.download-qr', $record))
+                            ->openUrlInNewTab(false),
                         Tables\Actions\Action::make('close')
                             ->label('Close')
                             ->color('gray')
