@@ -25,23 +25,89 @@ class DatabaseSeeder extends Seeder
             'is_admin' => true,
         ]);
 
-        // Create demo tenants
+        // Create demo tenants with branding
         $tenant1 = Tenant::create([
             'name' => 'Pizza Palace',
             'slug' => 'pizza-palace',
             'is_active' => true,
+            'business_description' => 'Authentic Italian pizzas made with fresh ingredients and traditional recipes. Our wood-fired oven creates the perfect crispy crust every time. Family-owned since 1985.',
+            'phone' => '+30 210 123 4567',
+            'email' => 'info@pizzapalace.gr',
+            'address' => 'Ermou 45, Athens 10563, Greece',
+            'primary_color' => '#DC2626',
+            'secondary_color' => '#FEF2F2',
+            'timetable' => [
+                'monday' => ['hours' => '11:00 - 23:00', 'closed' => false],
+                'tuesday' => ['hours' => '11:00 - 23:00', 'closed' => false],
+                'wednesday' => ['hours' => '11:00 - 23:00', 'closed' => false],
+                'thursday' => ['hours' => '11:00 - 23:00', 'closed' => false],
+                'friday' => ['hours' => '11:00 - 24:00', 'closed' => false],
+                'saturday' => ['hours' => '11:00 - 24:00', 'closed' => false],
+                'sunday' => ['hours' => '12:00 - 23:00', 'closed' => false],
+            ],
+            'social_links' => [
+                'facebook' => 'https://facebook.com/pizzapalace.athens',
+                'instagram' => 'https://instagram.com/pizzapalace_gr',
+                'twitter' => 'https://twitter.com/pizzapalace_gr',
+                'website' => 'https://pizzapalace.gr',
+                'whatsapp' => '+30 210 123 4567',
+            ],
         ]);
 
         $tenant2 = Tenant::create([
             'name' => 'Burger Barn',
             'slug' => 'burger-barn',
             'is_active' => true,
+            'business_description' => 'Premium handcrafted burgers made with locally sourced beef and fresh ingredients. Our signature sauces and artisan buns make every bite unforgettable.',
+            'phone' => '+30 210 987 6543',
+            'email' => 'hello@burgerbarn.gr',
+            'address' => 'Syntagma Square 12, Athens 10557, Greece',
+            'primary_color' => '#EA580C',
+            'secondary_color' => '#FFF7ED',
+            'timetable' => [
+                'monday' => ['hours' => '12:00 - 22:00', 'closed' => false],
+                'tuesday' => ['hours' => '12:00 - 22:00', 'closed' => false],
+                'wednesday' => ['hours' => '12:00 - 22:00', 'closed' => false],
+                'thursday' => ['hours' => '12:00 - 22:00', 'closed' => false],
+                'friday' => ['hours' => '12:00 - 23:00', 'closed' => false],
+                'saturday' => ['hours' => '12:00 - 23:00', 'closed' => false],
+                'sunday' => ['hours' => 'Closed', 'closed' => true],
+            ],
+            'social_links' => [
+                'facebook' => 'https://facebook.com/burgerbarn.athens',
+                'instagram' => 'https://instagram.com/burgerbarn_gr',
+                'twitter' => '',
+                'website' => 'https://burgerbarn.gr',
+                'whatsapp' => '+30 210 987 6543',
+            ],
         ]);
 
         $tenant3 = Tenant::create([
             'name' => 'Taverna Οτιθέλεις',
             'slug' => 'otitheleis',
             'is_active' => true,
+            'business_description' => 'Αυθεντική ελληνική ταβέρνα με παραδοσιακές συνταγές και φρέσκα υλικά. Σπιτική μαγειρική σε ζεστό οικογενειακό περιβάλλον. Εδώ βρίσκεις ό,τι θέλεις!',
+            'phone' => '+30 210 555 1234',
+            'email' => 'info@otitheleis.gr',
+            'address' => 'Πλάκα 23, Αθήνα 10556',
+            'primary_color' => '#1D4ED8',
+            'secondary_color' => '#EFF6FF',
+            'timetable' => [
+                'monday' => ['hours' => '09:00 - 23:00', 'closed' => false],
+                'tuesday' => ['hours' => '09:00 - 23:00', 'closed' => false],
+                'wednesday' => ['hours' => '09:00 - 23:00', 'closed' => false],
+                'thursday' => ['hours' => '09:00 - 23:00', 'closed' => false],
+                'friday' => ['hours' => '09:00 - 24:00', 'closed' => false],
+                'saturday' => ['hours' => '09:00 - 24:00', 'closed' => false],
+                'sunday' => ['hours' => '10:00 - 23:00', 'closed' => false],
+            ],
+            'social_links' => [
+                'facebook' => 'https://facebook.com/taverna.otitheleis',
+                'instagram' => 'https://instagram.com/otitheleis_taverna',
+                'twitter' => '',
+                'website' => 'https://otitheleis.gr',
+                'whatsapp' => '+30 210 555 1234',
+            ],
         ]);
 
         // Create users for each tenant
