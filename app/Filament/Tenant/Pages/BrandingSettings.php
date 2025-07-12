@@ -45,6 +45,7 @@ class BrandingSettings extends Page
             'social_links' => $tenant->formatted_social_links,
             'primary_color' => $tenant->primary_color ?? '#3B82F6',
             'secondary_color' => $tenant->secondary_color ?? '#6B7280',
+            'theme' => $tenant->theme ?? 'classic',
         ];
 
         $this->form->fill($this->data);
@@ -79,6 +80,47 @@ class BrandingSettings extends Page
                                     ->label('Secondary Brand Color')
                                     ->helperText('Secondary color for text and borders'),
                             ]),
+                    ]),
+
+                Forms\Components\Section::make('Theme Selection')
+                    ->description('Choose the visual theme for your restaurant page')
+                    ->schema([
+                        Forms\Components\Select::make('theme')
+                            ->label('Page Theme')
+                            ->options(function () {
+                                $themeService = app(\App\Services\ThemeService::class);
+                                return $themeService->getThemeOptions();
+                            })
+                            ->default('classic')
+                            ->required()
+                            ->live()
+                            ->helperText('Select how your restaurant page will look to customers')
+                            ->columnSpanFull(),
+                        
+                        Forms\Components\Placeholder::make('theme_preview')
+                            ->label('Theme Preview')
+                            ->content(function (Forms\Get $get) {
+                                $selectedTheme = $get('theme') ?? 'classic';
+                                $themeService = app(\App\Services\ThemeService::class);
+                                $theme = $themeService->getTheme($selectedTheme);
+                                
+                                if (!$theme) return 'Theme not found';
+                                
+                                return new \Illuminate\Support\HtmlString(
+                                    '<div class="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">' .
+                                    '<div class="flex items-center space-x-4">' .
+                                    '<div class="w-24 h-16 bg-gray-200 dark:bg-gray-700 rounded border flex items-center justify-center text-xs text-gray-500">' .
+                                    'Preview' .
+                                    '</div>' .
+                                    '<div>' .
+                                    '<h4 class="font-semibold text-gray-900 dark:text-gray-100">' . $theme['name'] . '</h4>' .
+                                    '<p class="text-sm text-gray-600 dark:text-gray-400">' . $theme['description'] . '</p>' .
+                                    '</div>' .
+                                    '</div>' .
+                                    '</div>'
+                                );
+                            })
+                            ->columnSpanFull(),
                     ]),
 
                 Forms\Components\Section::make('Business Information')
@@ -217,6 +259,7 @@ class BrandingSettings extends Page
             'social_links' => $data['social_links'] ?? [],
             'primary_color' => $data['primary_color'] ?? '#3B82F6',
             'secondary_color' => $data['secondary_color'] ?? '#6B7280',
+            'theme' => $data['theme'] ?? 'classic',
         ]);
 
         Notification::make()

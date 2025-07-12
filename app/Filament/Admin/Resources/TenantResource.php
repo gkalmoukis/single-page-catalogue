@@ -73,6 +73,17 @@ class TenantResource extends Resource
                                     ->default('#6B7280')
                                     ->helperText('Secondary color for text and borders'),
                             ]),
+                        
+                        Forms\Components\Select::make('theme')
+                            ->label('Page Theme')
+                            ->options(function () {
+                                $themeService = app(\App\Services\ThemeService::class);
+                                return $themeService->getThemeOptions();
+                            })
+                            ->default('classic')
+                            ->required()
+                            ->helperText('Choose the visual theme for the restaurant page')
+                            ->columnSpanFull(),
                     ]),
 
                 Forms\Components\Section::make('Business Details')

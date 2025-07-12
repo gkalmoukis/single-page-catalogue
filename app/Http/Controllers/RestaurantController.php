@@ -34,23 +34,28 @@ class RestaurantController extends Controller
 
         $cacheKey = config('default.catalogue_cache_key') . '_' . $tenant->id;
         
-        return view('restaurant.show', [
+        $categories = Cache::remember(
+            $cacheKey, 
+            config('default.catalogue_cache_ttl'), 
+            function () use ($tenant) {
+                return Category::forTenant($tenant->id)
+                    ->with([
+                        'items' => fn ($query) => $query->active()
+                            ->forTenant($tenant->id)
+                            ->with('tags')
+                            ->orderBy('sort_order')
+                    ])
+                    ->orderBy('sort_order')
+                    ->get();
+            }
+        );
+
+        // Get the theme view name from the tenant
+        $themeView = $tenant->theme_view;
+        
+        return view($themeView, [
             'tenant' => $tenant,
-            'categories' => Cache::remember(
-                $cacheKey, 
-                config('default.catalogue_cache_ttl'), 
-                function () use ($tenant) {
-                    return Category::forTenant($tenant->id)
-                        ->with([
-                            'items' => fn ($query) => $query->active()
-                                ->forTenant($tenant->id)
-                                ->with('tags')
-                                ->orderBy('sort_order')
-                        ])
-                        ->orderBy('sort_order')
-                        ->get();
-                }
-            )
+            'categories' => $categories,
         ]);
     }
 }

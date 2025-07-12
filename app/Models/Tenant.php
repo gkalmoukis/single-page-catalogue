@@ -30,6 +30,7 @@ class Tenant extends Model implements HasMedia
         'social_links',
         'primary_color',
         'secondary_color',
+        'theme',
     ];
 
     protected $casts = [
@@ -189,5 +190,23 @@ class Tenant extends Model implements HasMedia
         ];
 
         return array_merge($defaultSocial, $this->social_links ?? []);
+    }
+
+    /**
+     * Get the current theme configuration
+     */
+    public function getThemeConfigAttribute(): array
+    {
+        $themeService = app(\App\Services\ThemeService::class);
+        return $themeService->getTheme($this->theme ?? 'classic') ?? $themeService->getTheme('classic');
+    }
+
+    /**
+     * Get the theme view name for rendering
+     */
+    public function getThemeViewAttribute(): string
+    {
+        $themeService = app(\App\Services\ThemeService::class);
+        return $themeService->getThemeView($this->theme ?? 'classic');
     }
 }
