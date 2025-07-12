@@ -14,6 +14,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class ItemResource extends Resource
 {
@@ -93,6 +95,12 @@ class ItemResource extends Resource
                     ->required(),
                 Forms\Components\Toggle::make('is_active')
                     ->default(true),
+                SpatieMediaLibraryFileUpload::make('photo')
+                    ->label('Photo')
+                    ->collection('photo')
+                    ->acceptedFileTypes(['image/*'])
+                    ->maxFiles(1)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -100,6 +108,13 @@ class ItemResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('photo')
+                    ->label('Photo')
+                    ->collection('photo')
+                    ->conversion('thumb')
+                    ->height(40)
+                    ->width(40)
+                    ->circular(),
                 Tables\Columns\TextColumn::make('tenant.name')
                     ->label('Restaurant')
                     ->searchable()

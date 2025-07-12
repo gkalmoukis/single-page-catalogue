@@ -95,6 +95,7 @@ return [
         // or
         // 'model_morph_alias' => PathGenerator::class
         \App\Models\Tenant::class => \App\Services\TenantMediaPathGenerator::class,
+        \App\Models\Item::class => \App\Services\TenantMediaPathGenerator::class,
     ],
 
     /*

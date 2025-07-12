@@ -11,7 +11,7 @@ class TenantMediaUrlGenerator extends DefaultUrlGenerator
     {
         $model = $this->media->model;
         
-        if ($model instanceof \App\Models\Tenant) {
+        if ($model instanceof \App\Models\Tenant || $model instanceof \App\Models\Item) {
             $path = $this->getMediaPath();
             return config('app.url') . '/storage/' . $path;
         }
@@ -23,7 +23,14 @@ class TenantMediaUrlGenerator extends DefaultUrlGenerator
     protected function getMediaPath(): string
     {
         $model = $this->media->model;
-        $basePath = "tenants/{$model->id}/{$this->media->collection_name}";
+        
+        if ($model instanceof \App\Models\Tenant) {
+            $basePath = "tenants/{$model->id}/{$this->media->collection_name}";
+        } elseif ($model instanceof \App\Models\Item) {
+            $basePath = "tenants/{$model->tenant_id}/items/{$model->id}/{$this->media->collection_name}";
+        } else {
+            return parent::getUrl();
+        }
         
         if ($this->conversion) {
             // For conversions (thumbnails, etc.)

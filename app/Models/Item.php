@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Item extends Model
+class Item extends Model implements HasMedia
 {
+    use InteractsWithMedia;
+
     protected $fillable = [
         'name',
         'price',
@@ -24,6 +29,47 @@ class Item extends Model
         'price' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Define media collections
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('photo')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+            ->singleFile()
+            ->useDisk('public');
+    }
+
+    /**
+     * Define media conversions
+     */
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(150)
+            ->height(150)
+            ->sharpen(10)
+            ->optimize()
+            ->format('webp')
+            ->nonQueued();
+
+        $this->addMediaConversion('medium')
+            ->width(400)
+            ->height(300)
+            ->sharpen(10)
+            ->optimize()
+            ->format('webp')
+            ->nonQueued();
+
+        $this->addMediaConversion('large')
+            ->width(800)
+            ->height(600)
+            ->sharpen(10)
+            ->optimize()
+            ->format('webp')
+            ->nonQueued();
+    }
 
     public function category(): BelongsTo
     {
@@ -56,6 +102,32 @@ class Item extends Model
     public function scopeForTenant($query, $tenantId)
     {
         return $query->where('tenant_id', $tenantId);
+    }
+
+    /**
+     * Check if item has a photo
+     */
+    public function hasPhoto(): bool
+    {
+        return $this->hasMedia('photo');
+    }
+
+    /**
+     * Get the photo URL for a specific conversion
+     */
+    public function getPhotoUrl(string $conversion = ''): ?string
+    {
+        if (!$this->hasPhoto()) {
+            return null;
+        }
+
+        $media = $this->getFirstMedia('photo');
+        
+        if ($conversion && $media->hasGeneratedConversion($conversion)) {
+            return $media->getUrl($conversion);
+        }
+        
+        return $media->getUrl();
     }
 
     protected static function booted()
