@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $tenant ? $tenant->name : config('app.name') }} | Μενού</title>
     <style>
+        :root {
+            --primary-color: {{ $tenant && $tenant->primary_color ? $tenant->primary_color : '#3B82F6' }};
+            --secondary-color: {{ $tenant && $tenant->secondary_color ? $tenant->secondary_color : '#6B7280' }};
+            --primary-color-light: {{ $tenant && $tenant->primary_color ? $tenant->primary_color . '20' : '#3B82F620' }};
+            --primary-color-dark: {{ $tenant && $tenant->primary_color ? 'color-mix(in srgb, ' . $tenant->primary_color . ' 80%, black)' : '#1E40AF' }};
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -28,10 +35,11 @@
             text-align: center;
             margin-bottom: 40px;
             padding: 30px 20px;
-            background: white;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-dark) 100%);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             position: relative;
+            color: white;
         }
 
         .logo {
@@ -39,17 +47,19 @@
             max-height: 100px;
             margin-bottom: 20px;
             border-radius: 8px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
         }
 
         .header h1 {
             font-size: 2rem;
             margin-bottom: 10px;
-            color: #333;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header .description {
             font-size: 1rem;
-            color: #666;
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 20px;
         }
 
@@ -73,10 +83,11 @@
         .info-section h3 {
             font-size: 1.2rem;
             margin-bottom: 15px;
-            color: #333;
+            color: var(--primary-color);
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 600;
         }
 
         .contact-grid {
@@ -89,15 +100,17 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #666;
+            color: var(--secondary-color);
         }
 
         .contact-item a {
-            color: #007bff;
+            color: var(--primary-color);
             text-decoration: none;
+            transition: color 0.2s;
         }
 
         .contact-item a:hover {
+            color: var(--primary-color-dark);
             text-decoration: underline;
         }
 
@@ -121,10 +134,11 @@
         .day-name {
             font-weight: 500;
             text-transform: capitalize;
+            color: var(--primary-color);
         }
 
         .hours {
-            color: #666;
+            color: var(--secondary-color);
         }
 
         .closed {
@@ -144,24 +158,28 @@
             align-items: center;
             gap: 8px;
             padding: 8px 16px;
-            background: #f8f9fa;
+            background: var(--primary-color-light);
+            border: 1px solid var(--primary-color);
             border-radius: 20px;
             text-decoration: none;
-            color: #333;
-            transition: background-color 0.2s;
+            color: var(--primary-color);
+            transition: all 0.2s;
         }
 
         .social-link:hover {
-            background: #e9ecef;
+            background: var(--primary-color);
+            color: white;
         }
 
         .whatsapp-link {
             background: #25D366;
             color: white;
+            border-color: #25D366;
         }
 
         .whatsapp-link:hover {
             background: #128C7E;
+            border-color: #128C7E;
         }
 
         .icon {
@@ -179,20 +197,22 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--primary-color-light);
         }
 
         .category-header {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-dark) 100%);
             padding: 20px;
             font-size: 1.5rem;
             font-weight: 600;
-            color: #333;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .category-description {
-            background: #f8f9fa;
+            background: var(--primary-color-light);
             padding: 0 20px 20px;
-            color: #666;
+            color: var(--secondary-color);
             font-size: 0.9rem;
             border-bottom: 1px solid #e9ecef;
         }
@@ -221,7 +241,7 @@
             border-radius: 8px;
             object-fit: cover;
             background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
+            border: 2px solid var(--primary-color-light);
         }
 
         .item-content {
@@ -239,12 +259,12 @@
         .item-name {
             font-size: 1.1rem;
             font-weight: 500;
-            color: #333;
+            color: var(--primary-color);
             margin-bottom: 5px;
         }
 
         .item-description {
-            color: #666;
+            color: var(--secondary-color);
             font-size: 0.9rem;
         }
 
@@ -258,7 +278,7 @@
             margin: 2px 4px 2px 0;
             font-size: 0.75rem;
             border-radius: 12px;
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: white;
             border-radius: 12px;
             font-weight: 500;
@@ -267,19 +287,24 @@
         .item-price {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #333;
+            color: var(--primary-color);
             margin-left: 20px;
+            background: var(--primary-color-light);
+            padding: 4px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--primary-color);
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #666;
+            color: var(--secondary-color);
         }
 
         .empty-state h3 {
             font-size: 1.2rem;
             margin-bottom: 10px;
+            color: var(--primary-color);
         }
 
         @media (max-width: 768px) {
